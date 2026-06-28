@@ -2577,27 +2577,47 @@ async function submitForm(){
 function renderWaitlistForm(){
   const tripName = trip.fields[F.name] || "הטיול";
   document.getElementById("app").innerHTML = `
-    <div class="card" style="text-align:center;padding:36px 24px;">
-      <div style="font-size:48px;margin-bottom:16px;">✈️</div>
-      <h2 style="color:var(--maroon-dark);margin:0 0 10px;">הטיול מלא</h2>
-      <p class="sub" style="margin-bottom:28px;">
-        כל המקומות ב<strong>${tripName}</strong> כבר אוכסנו.<br>
-        השאירו פרטים ונודיע לכם ראשונים אם יתפנה מקום.
-      </p>
-      <form id="waitlistForm" style="text-align:right;max-width:380px;margin:0 auto;">
-        <div style="margin-bottom:14px;">
+    <div class="trip-header">
+      <span class="header-plane">✈</span>
+      <div class="trip-header-main">
+        <div class="trip-heading-row">
+          <div class="trip-heading-copy">
+            <p class="trip-eyebrow">רשימת המתנה לטיול</p>
+            <h1 class="trip-name">${tripName}</h1>
+          </div>
+          <div class="trip-logo-wrap">
+            <img class="trip-logo-embed" src="logo.jpg" alt="לוגו קשרי תרבות תבל" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="trip-meta">
+          ${trip.fields[F.departDate] ? `<span>🛫 יציאה: ${trip.fields[F.departDate]}</span>`:""}
+          ${trip.fields[F.returnDate] ? `<span>🛬 חזרה: ${trip.fields[F.returnDate]}</span>`:""}
+          ${tripTypeName() ? `<span>🏷️ ${tripTypeName()}</span>`:""}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="alert-box" style="margin-bottom:20px;">
+        כל המקומות בטיול זה כבר אוכסנו. השאירו פרטים ונודיע לכם ראשונים אם יתפנה מקום.
+      </div>
+      <h2 style="margin-top:0;">הצטרפות לרשימת המתנה</h2>
+      <p class="sub" style="margin-bottom:22px;">מלאו את הפרטים הבאים ונחזור אליכם בהקדם.</p>
+      <form id="waitlistForm">
+        <div class="field-row" style="margin-bottom:16px;">
           <label class="field-label">שם מלא <span class="req">*</span></label>
           <input type="text" id="wl_name" class="field-input" placeholder="ישראל ישראלי" required>
         </div>
-        <div style="margin-bottom:14px;">
+        <div class="field-row" style="margin-bottom:16px;">
           <label class="field-label">טלפון <span class="req">*</span></label>
           <input type="tel" id="wl_phone" class="field-input" placeholder="050-0000000" required>
         </div>
-        <div style="margin-bottom:28px;">
+        <div class="field-row" style="margin-bottom:28px;">
           <label class="field-label">אימייל <span class="req">*</span></label>
           <input type="email" id="wl_email" class="field-input" placeholder="israel@example.com" required>
         </div>
-        <button type="submit" class="btn-primary" style="width:100%;padding:14px;font-size:15px;">הוסיפו אותי לרשימת ההמתנה</button>
+        <div class="nav-row">
+          <button type="submit" class="btn-primary" style="flex:1;padding:14px;font-size:15px;">הוסיפו אותי לרשימת ההמתנה ←</button>
+        </div>
       </form>
     </div>`;
 
