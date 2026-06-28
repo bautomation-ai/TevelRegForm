@@ -657,6 +657,96 @@
     60%{opacity:1;}
     100%{transform:translateX(120px) translateY(-60px) rotate(-25deg);opacity:0;}
   }
+  /* === WAITLIST BOARDING PASS === */
+  .wl-scene{
+    position:fixed;inset:0;z-index:200;overflow-y:auto;
+    background:
+      radial-gradient(900px 600px at 80% 20%,rgba(122,21,21,.07),transparent),
+      radial-gradient(700px 500px at 10% 80%,rgba(45,94,60,.08),transparent),
+      #F0EBE3;
+    display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .wl-scene::before{content:none;}
+  .wl-pass{
+    background:#fff;border-radius:20px;
+    width:100%;max-width:480px;
+    box-shadow:0 20px 60px rgba(122,21,21,.15), 0 4px 16px rgba(0,0,0,.08);
+    overflow:hidden;
+    animation:fadeSlideUp .5s ease both;
+    position:relative;z-index:1;
+  }
+  .wl-pass-header{
+    background:#F8F4EE;
+    color:#2C2A28;padding:0 0 20px;position:relative;overflow:hidden;
+  }
+  .wl-header-topbar{
+    height:5px;
+    background:linear-gradient(90deg,#7A1515 0%,#B99552 50%,#2d5e3c 100%);
+    margin-bottom:20px;
+  }
+  .wl-header-inner{padding:0 24px;}
+  .wl-header-top{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .wl-logo{width:90px;height:auto;display:block;mix-blend-mode:darken;}
+  .wl-status-badge{
+    background:rgba(122,21,21,.08);border:1px solid rgba(122,21,21,.3);
+    color:#7A1515;font-size:10px;font-weight:700;letter-spacing:2px;
+    padding:4px 12px;border-radius:999px;
+  }
+  .wl-route{
+    display:flex;align-items:center;gap:14px;
+    margin-bottom:14px;
+  }
+  .wl-city{flex-shrink:0;text-align:center;}
+  .wl-city-code{font-size:36px;font-weight:700;line-height:1;letter-spacing:-1px;color:#7A1515;}
+  .wl-city-label{font-size:10px;color:#888;letter-spacing:1px;margin-top:3px;}
+  .wl-route-mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .wl-route-plane{font-size:20px;}
+  .wl-route-line{
+    width:100%;height:1px;
+    background:linear-gradient(90deg,rgba(122,21,21,.1),rgba(122,21,21,.4),rgba(122,21,21,.1));
+  }
+  .wl-trip-name-label{
+    font-size:12px;color:#888;letter-spacing:.5px;text-align:center;
+  }
+  .wl-perf{display:flex;align-items:center;}
+  .wl-perf-circle{
+    width:24px;height:24px;border-radius:50%;flex-shrink:0;
+    background:#F0EBE3;border:1px solid #e0d8d0;
+  }
+  .wl-perf-line{flex:1;border-top:2px dashed #dde;margin:0 3px;}
+  .wl-form-body{padding:26px 26px 22px;}
+  .wl-form-title{font-size:19px;font-weight:700;color:#1a1a2e;margin:0 0 5px;}
+  .wl-form-sub{font-size:13px;color:#999;margin:0 0 26px;line-height:1.55;}
+  .wl-field{margin-bottom:22px;}
+  .wl-field label{
+    display:block;font-size:10px;font-weight:700;
+    letter-spacing:1.5px;color:#bbb;margin-bottom:8px;
+  }
+  .wl-field input{
+    width:100%;border:none;
+    border-bottom:2px solid #ebebeb;
+    padding:8px 0;font-size:15px;font-weight:500;
+    font-family:'Assistant',sans-serif;direction:rtl;
+    outline:none;background:transparent;color:#1a1a2e;
+    transition:border-color .2s;
+  }
+  .wl-field input:focus{border-bottom-color:#7A1515;}
+  .wl-submit{
+    background:linear-gradient(135deg,#6B1212,#8C1B1B);
+    color:#fff;border:none;width:100%;
+    padding:15px;border-radius:12px;
+    font-size:15px;font-weight:700;
+    font-family:'Assistant',sans-serif;
+    cursor:pointer;margin-top:10px;letter-spacing:.3px;
+    transition:transform .15s,box-shadow .15s;
+  }
+  .wl-submit:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(122,21,21,.45);}
+  .wl-submit:disabled{opacity:.6;transform:none;cursor:default;}
+  .wl-pass-footer{height:6px;background:linear-gradient(90deg,#73122B 0%,#B99552 50%,#48826E 100%);}
+
   /* airplane floating in trip header */
   .header-plane{
     position:absolute;
@@ -2576,49 +2666,62 @@ async function submitForm(){
    ====================================================================== */
 function renderWaitlistForm(){
   const tripName = trip.fields[F.name] || "הטיול";
+  const departDate = trip.fields[F.departDate] || "";
+  const returnDate = trip.fields[F.returnDate] || "";
+  const dateLine = [departDate ? `🛫 ${departDate}` : "", returnDate ? `🛬 ${returnDate}` : ""].filter(Boolean).join(" · ");
+
   document.getElementById("app").innerHTML = `
-    <div class="trip-header">
-      <span class="header-plane">✈</span>
-      <div class="trip-header-main">
-        <div class="trip-heading-row">
-          <div class="trip-heading-copy">
-            <p class="trip-eyebrow">רשימת המתנה לטיול</p>
-            <h1 class="trip-name">${tripName}</h1>
+    <div class="wl-scene">
+      <div class="wl-pass">
+        <div class="wl-pass-header">
+          <div class="wl-header-topbar"></div>
+          <div class="wl-header-inner">
+            <div class="wl-header-top">
+              <img src="logo.jpg" class="wl-logo" alt="לוגו תבל">
+              <span class="wl-status-badge">WAITLIST</span>
+            </div>
+            <div class="wl-route">
+              <div class="wl-city">
+                <div class="wl-city-code">TLV</div>
+                <div class="wl-city-label">תל אביב</div>
+              </div>
+              <div class="wl-route-mid">
+                <div class="wl-route-plane">✈</div>
+                <div class="wl-route-line"></div>
+              </div>
+              <div class="wl-city">
+                <div class="wl-city-code" style="max-width:160px;word-break:break-word;">${tripName}</div>
+              </div>
+            </div>
+            ${dateLine ? `<div class="wl-trip-name-label">${dateLine}</div>` : ""}
           </div>
-          <div class="trip-logo-wrap">
-            <img class="trip-logo-embed" src="logo.jpg" alt="לוגו קשרי תרבות תבל" loading="lazy" decoding="async">
-          </div>
         </div>
-        <div class="trip-meta">
-          ${trip.fields[F.departDate] ? `<span>🛫 יציאה: ${trip.fields[F.departDate]}</span>`:""}
-          ${trip.fields[F.returnDate] ? `<span>🛬 חזרה: ${trip.fields[F.returnDate]}</span>`:""}
-          ${tripTypeName() ? `<span>🏷️ ${tripTypeName()}</span>`:""}
+        <div class="wl-perf">
+          <div class="wl-perf-circle"></div>
+          <div class="wl-perf-line"></div>
+          <div class="wl-perf-circle"></div>
         </div>
+        <div class="wl-form-body">
+          <h2 class="wl-form-title">הצטרפות לרשימת המתנה</h2>
+          <p class="wl-form-sub">כל המקומות אוכסנו. השאירו פרטים ונודיע לכם ראשונים אם יתפנה מקום.</p>
+          <form id="waitlistForm">
+            <div class="wl-field">
+              <label>שם מלא</label>
+              <input type="text" id="wl_name" required>
+            </div>
+            <div class="wl-field">
+              <label>טלפון</label>
+              <input type="tel" id="wl_phone" required>
+            </div>
+            <div class="wl-field">
+              <label>אימייל</label>
+              <input type="email" id="wl_email" required>
+            </div>
+            <button type="submit" class="wl-submit">הוסיפו אותי לרשימת ההמתנה ✈</button>
+          </form>
+        </div>
+        <div class="wl-pass-footer"></div>
       </div>
-    </div>
-    <div class="card">
-      <div class="alert-box" style="margin-bottom:20px;">
-        כל המקומות בטיול זה כבר אוכסנו. השאירו פרטים ונודיע לכם ראשונים אם יתפנה מקום.
-      </div>
-      <h2 style="margin-top:0;">הצטרפות לרשימת המתנה</h2>
-      <p class="sub" style="margin-bottom:22px;">מלאו את הפרטים הבאים ונחזור אליכם בהקדם.</p>
-      <form id="waitlistForm">
-        <div class="field-row" style="margin-bottom:16px;">
-          <label class="field-label">שם מלא <span class="req">*</span></label>
-          <input type="text" id="wl_name" class="field-input" placeholder="ישראל ישראלי" required>
-        </div>
-        <div class="field-row" style="margin-bottom:16px;">
-          <label class="field-label">טלפון <span class="req">*</span></label>
-          <input type="tel" id="wl_phone" class="field-input" placeholder="050-0000000" required>
-        </div>
-        <div class="field-row" style="margin-bottom:28px;">
-          <label class="field-label">אימייל <span class="req">*</span></label>
-          <input type="email" id="wl_email" class="field-input" placeholder="israel@example.com" required>
-        </div>
-        <div class="nav-row">
-          <button type="submit" class="btn-primary" style="flex:1;padding:14px;font-size:15px;">הוסיפו אותי לרשימת ההמתנה ←</button>
-        </div>
-      </form>
     </div>`;
 
   document.getElementById("waitlistForm").onsubmit = async (e) => {
