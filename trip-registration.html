@@ -847,6 +847,16 @@ async function apiGet(path){
   return res.json();
 }
 
+async function apiPost(path, body){
+  const res = await fetch(`${CONFIG.API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok) throw new Error(`API error ${res.status}`);
+  return res.json();
+}
+
 async function loadRuntimeConfig(){
   try{
     const cfg = await apiGet("/api/config");
@@ -902,6 +912,14 @@ async function loadTrip(){
     const showIds = tripShowRecordIds();
     if(showIds.length){
       await loadShowOptions(showIds);
+    }
+
+    // Check if trip is full → waitlist flow
+    const registered = Number(trip.namedFields?.["כמות נרשמים"] || 0);
+    const capacity   = Number(trip.namedFields?.["מספר מקומות"]  || 0);
+    if(capacity > 0 && registered >= capacity){
+      renderWaitlistForm();
+      return;
     }
 
     buildSteps();
@@ -1405,6 +1423,18 @@ function buildPaymentSummary(){
     const unit = showPrice(showRec);
     const info = showHierarchyInfo(showRec);
     addComponent(`כרטיס מופע: ${info.showName} - ${info.ticketType}`, qty, unit, unit * qty);
+  }
+
+  // Early booking discount — apply if end date exists and hasn't passed
+  const earlyBookingEndDate = trip?.namedFields?.["תאריך סיום הרשמה מוקדמת"] || "";
+  const earlyBookingDiscountAmount = Number(trip?.namedFields?.["סכום הנחה מוקדמת"] || 75);
+  if(earlyBookingEndDate && earlyBookingDiscountAmount > 0){
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const deadline = new Date(earlyBookingEndDate);
+    if(!isNaN(deadline) && today <= deadline){
+      addComponent("הנחת רישום מוקדם", 1, -earlyBookingDiscountAmount, -earlyBookingDiscountAmount);
+    }
   }
 
   const estimatedTotal = components.reduce((sum, c)=>sum + numberFromField(c.amount), 0);
@@ -2340,14 +2370,19 @@ function validateConsentsStep(){
 function renderPaymentStep(container){
   const p = state.payment;
   const summary = buildPaymentSummary();
-  const moneyRows = summary.components.map((c)=>`
-      <div class="money-row">
-        <div>${c.label}${c.meta ? ` <span class="money-note">(${c.meta})</span>` : ""}</div>
-        <div class="num">${c.quantity}</div>
-        <div class="num">${formatTripAmount(c.unitAmount)}</div>
-        <div class="num">${formatTripAmount(c.amount)}</div>
-      </div>
-    `).join("");
+  const moneyRows = summary.components.map((c)=>{
+    const isDiscount = Number(c.amount) < 0;
+    const rowStyle = isDiscount ? ' style="background:#f0f7f4;color:#1e6b4a;"' : '';
+    const amountStyle = isDiscount ? ' style="color:#1e6b4a;font-weight:700;"' : '';
+    const labelPrefix = isDiscount ? '✓ ' : '';
+    return `
+      <div class="money-row"${rowStyle}>
+        <div>${labelPrefix}${c.label}${c.meta ? ` <span class="money-note">(${c.meta})</span>` : ""}</div>
+        <div class="num">${isDiscount ? '' : c.quantity}</div>
+        <div class="num">${isDiscount ? '' : formatTripAmount(c.unitAmount)}</div>
+        <div class="num"${amountStyle}>${formatTripAmount(c.amount)}</div>
+      </div>`;
+  }).join("");
 
   const notesHtml = summary.notes.length
     ? `<div class="money-note">${summary.notes.join(" ")}</div>`
@@ -2534,6 +2569,84 @@ async function submitForm(){
     console.error(e);
     alert("אירעה שגיאה בשליחת הטופס. נסו שוב, או פנו אלינו.");
   }
+}
+
+/* ======================================================================
+   Waitlist flow
+   ====================================================================== */
+function renderWaitlistForm(){
+  const tripName = trip.fields[F.name] || "הטיול";
+  document.getElementById("app").innerHTML = `
+    <div class="card" style="text-align:center;padding:36px 24px;">
+      <div style="font-size:48px;margin-bottom:16px;">✈️</div>
+      <h2 style="color:var(--maroon-dark);margin:0 0 10px;">הטיול מלא</h2>
+      <p class="sub" style="margin-bottom:28px;">
+        כל המקומות ב<strong>${tripName}</strong> כבר אוכסנו.<br>
+        השאירו פרטים ונודיע לכם ראשונים אם יתפנה מקום.
+      </p>
+      <form id="waitlistForm" style="text-align:right;max-width:380px;margin:0 auto;">
+        <div style="margin-bottom:14px;">
+          <label class="field-label">שם מלא <span class="req">*</span></label>
+          <input type="text" id="wl_name" class="field-input" placeholder="ישראל ישראלי" required>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label class="field-label">טלפון <span class="req">*</span></label>
+          <input type="tel" id="wl_phone" class="field-input" placeholder="050-0000000" required>
+        </div>
+        <div style="margin-bottom:28px;">
+          <label class="field-label">אימייל <span class="req">*</span></label>
+          <input type="email" id="wl_email" class="field-input" placeholder="israel@example.com" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;padding:14px;font-size:15px;">הוסיפו אותי לרשימת ההמתנה</button>
+      </form>
+    </div>`;
+
+  document.getElementById("waitlistForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const name  = document.getElementById("wl_name").value.trim();
+    const phone = document.getElementById("wl_phone").value.trim();
+    const email = document.getElementById("wl_email").value.trim();
+    if(!name || !phone || !email){ alert("יש למלא את כל השדות"); return; }
+
+    const btn = e.target.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "שולח…";
+
+    try{
+      await apiPost("/api/waitlist", {
+        tripId:   getTripId(),
+        tripName,
+        name, phone, email,
+        submittedAt: new Date().toISOString()
+      });
+      renderWaitlistDone();
+    }catch(err){
+      alert("אירעה שגיאה בשליחה. נסו שוב.");
+      btn.disabled = false;
+      btn.textContent = "הוסיפו אותי לרשימת ההמתנה";
+    }
+  };
+}
+
+function renderWaitlistDone(){
+  document.getElementById("app").innerHTML = `
+    <div class="card done-wrap">
+      <div class="check">
+        <svg viewBox="0 0 40 40" fill="none" stroke="var(--maroon)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="44" height="44">
+          <polyline points="8,21 16,30 32,12" class="check-svg-path"/>
+        </svg>
+      </div>
+      <h2>נרשמתם לרשימת ההמתנה!</h2>
+      <p class="sub">
+        פרטיכם נקלטו בהצלחה.<br><br>
+        <strong>מה עכשיו?</strong><br>
+        נשמור את מקומכם ברשימת ההמתנה ונעדכן אתכם מיד אם יתפנה מקום.<br><br>
+        בינתיים — מוזמנים לעיין בטיולים הנוספים שלנו ולבחור את ההרפתקה הבאה שלכם.<br><br>
+        🌍 מחכים לנסוע איתכם!
+      </p>
+      <span class="done-plane">✈</span>
+    </div>`;
+  setTimeout(launchConfetti, 700);
 }
 
 function launchConfetti(){

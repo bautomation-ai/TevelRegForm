@@ -15,6 +15,7 @@ const SHOWS_TABLE = process.env.AIRTABLE_SHOWS_TABLE || "tblZAv8IFt1rxBszk";
 const CRUISE_TRIP_LINK_FIELD_ID = process.env.AIRTABLE_CRUISE_TRIP_LINK_FIELD_ID || "fldq4NaVbTEsGvpNu";
 const DEFAULT_TRIP_ID = process.env.DEFAULT_TRIP_ID || "";
 const SUBMIT_WEBHOOK_URL = process.env.SUBMIT_WEBHOOK_URL || "";
+const WAITLIST_WEBHOOK_URL = process.env.WAITLIST_WEBHOOK_URL || "";
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.static(path.join(__dirname)));
@@ -208,6 +209,37 @@ app.post("/api/submissions", async (req, res) => {
 
   try {
     const webhookRes = await fetch(SUBMIT_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!webhookRes.ok) {
+      const body = await webhookRes.text();
+      return res.status(502).json({
+        ok: false,
+        error: "webhook_failed",
+        status: webhookRes.status,
+        message: body
+      });
+    }
+
+    res.json({ ok: true, mode: "webhook" });
+  } catch (err) {
+    res.status(502).json({ ok: false, error: "webhook_failed", message: err.message });
+  }
+});
+
+app.post("/api/waitlist", async (req, res) => {
+  const payload = req.body || {};
+
+  if (!WAITLIST_WEBHOOK_URL) {
+    console.log("[waitlist:draft]", JSON.stringify(payload, null, 2));
+    return res.json({ ok: true, mode: "dry-run" });
+  }
+
+  try {
+    const webhookRes = await fetch(WAITLIST_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
