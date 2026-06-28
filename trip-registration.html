@@ -1,0 +1,2527 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הרשמה לטיול | תבל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#73122B;
+    --maroon-dark:#54091F;
+    --sage:#DCE8E3;
+    --sage-light:#E4EEEA;
+    --cream:#F8F4EE;
+    --gold:#B99552;
+    --ink:#2C2A28;
+    --muted:#6b6360;
+    --card:#FFFFFF;
+    --border:#DCD3CC;
+    --error:#A4292B;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Assistant',sans-serif;
+    background:
+      radial-gradient(1200px 500px at 100% -10%, rgba(115,18,43,.08), transparent 62%),
+      radial-gradient(900px 420px at 0% 0%, rgba(72,130,110,.10), transparent 58%),
+      linear-gradient(180deg, #edf3f0 0%, var(--cream) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    direction:rtl;
+  }
+  .app{
+    max-width:760px;
+    margin:0 auto;
+    padding:24px 18px 80px;
+  }
+  .top-utility{
+    position:sticky;
+    top:0;
+    z-index:20;
+    margin:0 -4px 10px;
+    padding:6px 4px;
+    backdrop-filter:blur(4px);
+  }
+  .demo-strip{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border:1px solid #d8ceb5;
+    border-radius:999px;
+    background:rgba(255,248,226,.95);
+    color:#5e4a0a;
+    padding:7px 10px;
+    font-size:12.5px;
+    line-height:1.3;
+  }
+  .demo-strip b{font-weight:700;}
+  .demo-strip .config-actions{margin-top:0;gap:6px;flex-wrap:nowrap;}
+  .demo-strip .mini-btn{padding:5px 9px;font-size:11.5px;border-radius:999px;}
+  .trip-warning{
+    margin-top:6px;
+    padding:7px 11px;
+    border-radius:10px;
+    border:1px solid #e5d4a3;
+    background:rgba(255,245,210,.9);
+    color:#6b5108;
+    font-size:12px;
+    line-height:1.4;
+  }
+  .trip-header-main{
+    position:relative;
+    z-index:1;
+    min-width:0;
+  }
+  .trip-heading-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+  }
+  .trip-heading-copy{min-width:0;}
+  .trip-logo-wrap{
+    width:112px;
+    flex-shrink:0;
+    align-self:flex-start;
+    margin-top:2px;
+    isolation:isolate;
+  }
+  .trip-logo-embed{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:8px;
+    mix-blend-mode:darken;
+    opacity:.93;
+    filter:saturate(.92) contrast(1.04);
+  }
+  @media (max-width:520px){
+    .trip-heading-row{flex-direction:column;align-items:center;gap:6px;margin-bottom:10px;}
+    .trip-heading-copy{text-align:center;}
+    .trip-logo-wrap{width:94px;align-self:center;margin-top:0;}
+    .trip-logo-embed{opacity:.9;}
+    .top-utility{margin:0 -2px 8px;padding:4px 2px;}
+    .demo-strip{padding:7px 8px;font-size:12px;}
+    .demo-strip .mini-btn{padding:5px 8px;font-size:11px;}
+  }
+  /* ---- Config notice ---- */
+  .config-banner{
+    background:#FFF3CD;
+    border:1px solid #E8C468;
+    color:#6b5108;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:13px;
+    margin-bottom:18px;
+    line-height:1.6;
+  }
+  .config-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+  .mini-btn{
+    background:#fff;
+    border:1px solid #c8b47b;
+    color:#6b5108;
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:12px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .mini-btn.active{
+    background:#6b5108;
+    color:#fff;
+    border-color:#6b5108;
+  }
+  /* ---- Header ---- */
+  .trip-header{
+    background:linear-gradient(180deg, rgba(255,255,255,.96) 0%, rgba(253,249,245,.96) 100%);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    margin-bottom:10px;
+    border:1px solid #e4d8ce;
+    box-shadow:0 2px 10px rgba(70,42,30,.05);
+    position:relative;
+    overflow:hidden;
+  }
+  .trip-header::before{
+    content:"";
+    position:absolute;
+    inset:auto 0 0;
+    height:4px;
+    background:linear-gradient(90deg, #7c1836 0%, #b99552 50%, #4c8a79 100%);
+    opacity:.95;
+  }
+  .trip-header::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 100% 0%, rgba(115,18,43,.07), transparent 52%);
+  }
+  .trip-eyebrow{
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.2px;
+    color:#6a4a42;
+    margin:0 0 6px;
+    text-align:right;
+  }
+  .trip-name{
+    font-family:'Assistant',sans-serif;
+    color:#5f1328;
+    font-size:34px;
+    font-weight:700;
+    margin:0;
+    line-height:1.15;
+    text-align:right;
+  }
+  .trip-meta{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    gap:10px;
+    font-size:12.5px;
+    color:#4f4a47;
+    font-weight:500;
+  }
+  .trip-meta span{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    background:#fff;
+    border:1px solid #e7ddd5;
+    border-radius:999px;
+    padding:4px 10px;
+  }
+
+  /* ---- Progress ---- */
+  .progress-row{
+    display:flex;
+    gap:6px;
+    margin:12px 0 8px;
+  }
+  .progress-seg{
+    flex:1;
+    height:5px;
+    border-radius:4px;
+    background:#fff;
+    border:1px solid var(--border);
+    overflow:hidden;
+  }
+  .progress-seg.done, .progress-seg.active{background:var(--maroon);border-color:var(--maroon);}
+  .step-label{
+    font-size:13px;
+    color:var(--muted);
+    margin:0;
+    text-align:right;
+  }
+  .step-label b{color:var(--maroon);}
+
+  /* ---- Card ---- */
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    border:1px solid #e4d8ce;
+    padding:28px 26px;
+    box-shadow:0 2px 4px rgba(0,0,0,.03), 0 14px 34px rgba(60,30,20,.08);
+  }
+  .card h2{
+    font-family:'Assistant',sans-serif;
+    font-size:29px;
+    margin:0 0 4px;
+    color:var(--maroon-dark);
+    line-height:1.15;
+  }
+  .card .sub{
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 20px;
+  }
+  .section-title{
+    font-size:14px;
+    font-weight:600;
+    color:var(--maroon);
+    margin:26px 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-title:first-of-type{margin-top:4px;}
+
+  /* ---- Form elements ---- */
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-size:13.5px;
+    font-weight:500;
+    margin-bottom:6px;
+    color:var(--ink);
+  }
+  .field label .req{color:var(--error);margin-right:3px;}
+  .field input[type=text],
+  .field input[type=date],
+  .field input[type=tel],
+  .field input[type=email],
+  .field input[type=number],
+  .field select,
+  .field textarea{
+    width:100%;
+    padding:11px 13px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-family:inherit;
+    font-size:14.5px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:2px solid var(--maroon);
+    outline-offset:1px;
+  }
+  .field .hint{font-size:12px;color:var(--muted);margin-top:5px;}
+  .field .err{font-size:12px;color:var(--error);margin-top:5px;display:none;}
+  .field .error-msg{font-size:12px;color:var(--error);margin-top:5px;min-height:16px;}
+  .field.invalid input, .field.invalid select{border-color:var(--error);}
+  .field.invalid .err{display:block;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:480px){.row2{grid-template-columns:1fr;}}
+
+  .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .choice-card{
+    border:2px solid var(--border);
+    border-radius:12px;
+    padding:16px 12px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+    transition:.15s;
+    background:#fff;
+  }
+  .choice-card.selected{
+    border-color:var(--maroon);
+    background:var(--sage-light);
+    color:var(--maroon-dark);
+  }
+
+  .switch-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:13px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:14px;
+    background:#fff;
+  }
+  .switch-row .lbl{font-size:14px;font-weight:500;flex:1;}
+  .switch{position:relative;width:44px;height:26px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:#D9D2CC;border-radius:30px;cursor:pointer;transition:.15s;}
+  .slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
+  input:checked + .slider{background:var(--maroon);}
+  input:checked + .slider::before{transform:translateX(-18px);}
+
+  .checkbox-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--border);
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  .checkbox-row:last-child{border-bottom:none;}
+  .checkbox-row input{margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:var(--maroon);}
+
+  .alert-box{
+    background:#FBEFEF;
+    border:1px solid #E3B9BA;
+    color:#7A2A2C;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13px;
+    margin-bottom:16px;
+    line-height:1.6;
+  }
+  .info-box{
+    background:var(--sage-light);
+    border:1px solid #BFD6CD;
+    color:#2F4B41;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13px;
+    margin-bottom:16px;
+    line-height:1.6;
+  }
+
+  .room-option{
+    border:2px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:10px;
+    cursor:pointer;
+    display:block;
+    background:#fff;
+  }
+  .room-option.selected{border-color:var(--maroon);background:var(--sage-light);}
+  .room-main{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .room-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .room-option .name{font-weight:600;font-size:14.5px;}
+  .room-option .price{font-size:13px;color:var(--muted);}
+  .room-badge{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    padding:3px 8px;
+    font-size:11px;
+    font-weight:700;
+    border:1px solid transparent;
+  }
+  .room-badge.base{background:#f7ebe2;color:#7a3e12;border-color:#e7c7aa;}
+  .room-badge.upgrade{background:#eef7f1;color:#1f6a42;border-color:#b9dcc7;}
+  .room-badge.downgrade{background:#f4eef8;color:#6a3f8f;border-color:#d7c2ea;}
+  .room-option.is-base{box-shadow:0 0 0 1px rgba(122,62,18,.08) inset;}
+  .room-option.is-upgrade{box-shadow:0 0 0 1px rgba(31,106,66,.08) inset;}
+  .room-option.is-downgrade{box-shadow:0 0 0 1px rgba(106,63,143,.08) inset;}
+  .room-details{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--border);
+    font-size:13px;
+    color:var(--ink);
+    display:grid;
+    gap:6px;
+  }
+  .room-detail-row{display:flex;justify-content:space-between;gap:10px;}
+  .room-detail-row .k{color:var(--muted);} 
+  .room-selected-note{font-size:12px;color:var(--maroon);font-weight:600;margin-top:6px;}
+
+  .shows-groups{display:grid;gap:14px;}
+  .show-group{
+    border:1px solid #dccfc5;
+    border-radius:14px;
+    background:linear-gradient(180deg, #fff 0%, #fcf8f4 100%);
+    padding:12px;
+    box-shadow:0 3px 10px rgba(70,42,30,.05);
+  }
+  .show-group-head{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    border-bottom:1px solid #e8ded7;
+    padding:2px 2px 10px;
+    margin-bottom:10px;
+    background:none;
+    border-left:none;
+    border-right:none;
+    border-top:none;
+    text-align:right;
+    cursor:pointer;
+  }
+  .show-group-head:focus-visible{outline:2px solid var(--maroon);outline-offset:2px;border-radius:8px;}
+  .show-group-head-left{min-width:0;}
+  .show-group-title{
+    margin:0;
+    font-size:21px;
+    color:#5f1328;
+    line-height:1.2;
+  }
+  .show-group-meta{margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;}
+  .show-meta-chip{
+    font-size:12px;
+    color:#5a514d;
+    background:#fff;
+    border:1px solid #eadfd7;
+    border-radius:999px;
+    padding:3px 8px;
+  }
+  .show-group-sub{
+    margin:0;
+    font-size:12px;
+    color:#6e6662;
+    background:#fff;
+    border:1px solid #eadfd7;
+    border-radius:999px;
+    padding:3px 8px;
+    white-space:nowrap;
+  }
+  .show-group-arrow{font-size:16px;color:#6a4a42;transition:transform .15s ease;line-height:1;}
+  .show-group.open .show-group-arrow{transform:rotate(180deg);}
+  .show-tickets{display:grid;gap:10px;}
+  .show-group-body{display:none;}
+  .show-group.open .show-group-body{display:block;}
+  .show-ticket{
+    margin:0;
+    border-width:1px;
+    border-color:#e4d9d1;
+    border-radius:12px;
+    background:#fff;
+    cursor:default;
+  }
+  .show-ticket.selected{
+    border-color:#7c1836;
+    background:linear-gradient(180deg,#fff 0%, #f9f0f4 100%);
+    box-shadow:0 0 0 1px rgba(124,24,54,.06) inset;
+  }
+  .show-ticket-main{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .show-ticket-title{font-weight:700;font-size:16px;color:#2f2a27;}
+  .show-ticket-price{font-size:14px;color:#5f1328;font-weight:700;white-space:nowrap;}
+  .show-ticket-check{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    font-weight:600;
+    color:#3b3532;
+  }
+  .show-ticket-check input{accent-color:var(--maroon);}
+  .show-qty-input{
+    width:94px;
+    padding:6px 8px;
+    border:1px solid #d8ccc3;
+    border-radius:8px;
+    font-family:inherit;
+    font-size:14px;
+    text-align:center;
+    background:#fff;
+  }
+  .show-detail-text{max-width:70%;line-height:1.45;}
+  @media (max-width:520px){
+    .show-group-title{font-size:18px;}
+    .show-group-head{align-items:center;}
+    .show-group-sub{font-size:11.5px;}
+    .show-detail-text{max-width:62%;}
+  }
+
+  .money-summary{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .money-row{
+    display:grid;
+    grid-template-columns:2.2fr .8fr 1fr 1fr;
+    gap:8px;
+    padding:10px 12px;
+    font-size:13px;
+    align-items:center;
+    border-bottom:1px solid var(--border);
+  }
+  .money-row.head{background:var(--sage-light);font-weight:600;color:var(--maroon-dark);}
+  .money-row:last-child{border-bottom:none;}
+  .money-row .num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;}
+  .money-total{
+    background:#f8f3f5;
+    border-top:2px solid var(--maroon);
+    font-weight:700;
+  }
+  .money-note{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:8px;
+  }
+  @media (max-width:540px){
+    .money-row{grid-template-columns:1.8fr .7fr 1fr 1fr;font-size:12.5px;padding:9px 10px;}
+  }
+
+  /* ---- Nav buttons ---- */
+  .nav-row{
+    display:flex;
+    gap:10px;
+    margin-top:26px;
+  }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{
+    flex:1;
+    background:linear-gradient(135deg,#6d1028 0%, #8a2140 100%);
+    color:#fff;
+    padding:14px 20px;
+    border-radius:10px;
+    font-size:15.5px;
+    font-weight:600;
+    box-shadow:0 8px 18px rgba(84,9,31,.22);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(84,9,31,.28);}
+  .btn-primary:disabled{opacity:.55;cursor:not-allowed;}
+  .btn-ghost{
+    background:#fff;
+    color:var(--maroon);
+    padding:14px 18px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:600;
+    border:1px solid #d8c9be;
+  }
+
+  .loader-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:80px 20px;
+    text-align:center;
+    color:var(--muted);
+  }
+  .spinner{
+    width:34px;height:34px;
+    border:3px solid var(--border);
+    border-top-color:var(--maroon);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+    margin-bottom:16px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .sig-pad{
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    touch-action:none;
+    width:100%;
+    height:140px;
+    display:block;
+  }
+  .sig-clear{
+    font-size:12.5px;
+    color:var(--maroon);
+    background:none;
+    margin-top:6px;
+    text-decoration:underline;
+    padding:0;
+  }
+
+  .done-wrap{text-align:center;padding:40px 10px;}
+  .done-wrap .check{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--sage-light);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 18px;
+    font-size:30px;color:var(--maroon);
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="loader-wrap" id="initialLoader">
+    <div class="spinner"></div>
+    <div>טוען את פרטי הטיול…</div>
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   הגדרות חיבור — למלא לפני שימוש בפועל
+   ====================================================================== */
+const CONFIG = {
+  API_BASE: "",
+  PROJECTS_TABLE: "tblEkbHGGpTnRyFgL",
+  CRUISE_TABLE: "tbl8tQShnBjmO4uUf",
+  SHOWS_TABLE: "tblZAv8IFt1rxBszk",
+  DEFAULT_TRIP_ID: "",
+  WEBHOOK_CONFIGURED: false,
+  DEMO_PREFILL: true,
+};
+
+// שמות שדות (Field IDs) בטבלת הפרויקטים
+const F = {
+  name: "fldfmeU6VoMtWPnRE",
+  status: "fldoRuQCKFb6bEYA5",
+  description: "fldkNGMg8NvApjFau",
+  departDate: "fldxrQvD8lMHF1fIK",
+  returnDate: "fldLt13cAruolur0B",
+  tripType: "fld7kv4cheWQCnSzB",
+  flightCost: "fldnqseWYdKYJhu1h",
+  baseCost: "fldeByzJqpJZZRcqM",
+  extraCost: "fldeAbMvT4lZ4fPGK",
+  currency: "fldDUwAcqx3qk5Bco",
+  shows: "fld1NO7JKZi53C7vd",
+  cruiseLinks: "fldkV6ommZAqnjkYx",
+};
+
+const CRUISE_F = {
+  name: "fldJglUZ4r0VFNuYa",
+  category: "fldJAh30fX0J3ed3I",
+  alias: "fldO6cfPMzStkZSAR",
+  cabinSize: "fldiEFX4Ettixh3LF",
+  price: "fldRXNMg8l392beGP",
+  singleSupplement: "fld0cG0dzb3R4jzVG",
+};
+
+const SHOW_F = {
+  name: "fldJglUZ4r0VFNuYa",
+  alias: "fldO6cfPMzStkZSAR",
+  price: "fldRXNMg8l392beGP",
+};
+
+const CRUISE_TRIP_TYPES = ["שייט רגיל", "שייט צרטר"];
+
+function todayISO(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function buildEmptyState(){
+  return {
+    travelersCount: "1",
+    travelers: [
+      { fullNameHe:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
+        meal:"", frequentFlyer:"", seat:"", flightRequests:"" },
+      { fullNameHe:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
+        meal:"", frequentFlyer:"", seat:"", flightRequests:"" }
+    ],
+    independentFlight:false,
+    insuranceOptIn:false,
+    insuranceOfferFollowUp:false,
+    insuranceOfferParallelConfirmed:false,
+    cruise:{ roomOptionId:"", wantsRoommate:false, roommateName:"", diningTable:"" },
+    shows:{ selected:{}, notes:"", expandedShow:"" },
+    address:{ street:"", zip:"", city:"", mobile:"", home:"", email:"" },
+    emergency:{ name:"", phone1:"", phone2:"" },
+    heardAboutUs:"",
+    consents:{},
+    payment:{ frequentTraveler:false, frequentTravelerTrips:"", method:"", signatureData:"", date:todayISO() }
+  };
+}
+
+function buildDemoState(){
+  const s = buildEmptyState();
+  s.travelersCount = "2";
+  s.travelers[0] = {
+    fullNameHe:"ישראל ישראלי", firstNameEn:"ISRAEL", lastNameEn:"ISRAELI", passportNum:"12345678",
+    passportExpiry:"2028-12-31", dob:"1985-04-15", profession:"מהנדס",
+    meal:"רגילה", frequentFlyer:"LY12345", seat:"חלון", flightRequests:""
+  };
+  s.travelers[1] = {
+    fullNameHe:"דנה ישראלי", firstNameEn:"DANA", lastNameEn:"ISRAELI", passportNum:"87654321",
+    passportExpiry:"2029-05-31", dob:"1988-09-22", profession:"מנהלת פרויקטים",
+    meal:"צמחונית", frequentFlyer:"LY67890", seat:"מעבר", flightRequests:""
+  };
+  s.insuranceOptIn = true;
+  s.insuranceOfferFollowUp = false;
+  s.insuranceOfferParallelConfirmed = false;
+  s.cruise = { roomOptionId:"", wantsRoommate:false, roommateName:"", diningTable:"חברים מהקבוצה" };
+  s.shows = { selected:{}, notes:"נשמח להמלצה על מופעים פופולריים" };
+  s.address = { street:"הרצל 12", zip:"6423901", city:"תל אביב", mobile:"0501234567", home:"035551234", email:"demo@example.com" };
+  s.emergency = { name:"יואב ישראלי", phone1:"0507654321", phone2:"039998877" };
+  s.heardAboutUs = "אתר אינטרנט";
+  s.consents = {
+    passportValidity:true,
+    physicalReq:true,
+    travelInsurance:true,
+    placeConfirmation:true,
+    dealTerms:true,
+    flightChanges:true,
+    orderOnly:true,
+    finalAgreement:true,
+    insuranceCoverage:true,
+    insuranceOfferAgency:true,
+    insuranceOfferParallel:true,
+    healthResponsibility:true,
+    registrationEmail:true,
+    noCancellationClaims:true,
+    tripConfirmationWindow:true,
+    supplierLimits:true,
+    programTerms:true,
+  };
+  s.payment = {
+    frequentTraveler:true,
+    frequentTravelerTrips:"יוון 2024, פורטוגל 2025",
+    method:"כרטיס אשראי",
+    signatureData:"demo-signature",
+    date:todayISO()
+  };
+  return s;
+}
+
+/* ======================================================================
+   State
+   ====================================================================== */
+let trip = null;          // רשומת הטיול מאיירטייבל
+let cruiseOptions = [];   // אופציות חדרים (אם רלוונטי)
+let showOptions = [];     // רשומות קטגוריות מופעים (flat, לסיכום תשלום)
+let showGroups  = [];     // [{show, categories:[]}] — היררכיה לתצוגה
+let currentStepIndex = 0;
+let steps = [];           // יחושב לפי סוג הטיול
+let demoPrefillEnabled = CONFIG.DEMO_PREFILL;
+
+const state = buildEmptyState();
+
+function replaceState(next){
+  for(const key of Object.keys(state)) delete state[key];
+  Object.assign(state, next);
+}
+
+function applyDemoMode(){
+  replaceState(demoPrefillEnabled ? buildDemoState() : buildEmptyState());
+  ensureCruiseSelection();
+}
+
+function setDemoMode(enabled){
+  demoPrefillEnabled = !!enabled;
+  applyDemoMode();
+  currentStepIndex = 0;
+  renderApp();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ======================================================================
+   Airtable helpers
+   ====================================================================== */
+async function apiGet(path){
+  const res = await fetch(`${CONFIG.API_BASE}${path}`);
+  if(!res.ok) throw new Error(`API error ${res.status}`);
+  return res.json();
+}
+
+async function loadRuntimeConfig(){
+  try{
+    const cfg = await apiGet("/api/config");
+    CONFIG.DEFAULT_TRIP_ID = cfg.defaultTripId || "";
+    CONFIG.WEBHOOK_CONFIGURED = !!cfg.webhookConfigured;
+    CONFIG.PROJECTS_TABLE = cfg.projectsTable || CONFIG.PROJECTS_TABLE;
+    CONFIG.CRUISE_TABLE = cfg.cruiseTable || CONFIG.CRUISE_TABLE;
+    CONFIG.SHOWS_TABLE = cfg.showsTable || CONFIG.SHOWS_TABLE;
+  }catch(e){
+    console.error("Failed to load /api/config", e);
+  }
+}
+
+let usingDefaultTripId = false;
+
+function getTripId(){
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get("id") || params.get("trip_id");
+  if(fromUrl) return fromUrl;
+  if(CONFIG.DEFAULT_TRIP_ID){
+    usingDefaultTripId = true;
+    return CONFIG.DEFAULT_TRIP_ID;
+  }
+  return null;
+}
+
+function initDemoModeFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.has("demo")){
+    const val = (params.get("demo") || "").trim();
+    demoPrefillEnabled = !(val === "0" || val.toLowerCase() === "false");
+  }
+}
+
+async function loadTrip(){
+  const id = getTripId();
+  if(!id){
+    renderFatalError("לא נמצא מזהה טיול בקישור. יש לפתוח את הטופס מקישור עם ?id=...");
+    return;
+  }
+  try{
+    const data = await apiGet(`/api/trips/${id}`);
+    trip = data;
+
+    if(trip.fields[F.cruiseLinks] && trip.fields[F.cruiseLinks].length){
+      await loadCruiseOptions(trip.fields[F.cruiseLinks]);
+    }
+
+    if(!cruiseOptions.length){
+      await loadCruiseOptionsByTripId(id);
+    }
+
+    const showIds = tripShowRecordIds();
+    if(showIds.length){
+      await loadShowOptions(showIds);
+    }
+
+    buildSteps();
+    renderApp();
+  }catch(e){
+    renderFatalError("אירעה שגיאה בטעינת פרטי הטיול. נסו לרענן את הדף, או פנו לתבל.");
+    console.error(e);
+  }
+}
+
+async function loadCruiseOptions(recordIds){
+  const ids = recordIds.join(",");
+  const data = await apiGet(`/api/cruise-options?ids=${encodeURIComponent(ids)}`);
+  cruiseOptions = data.records || [];
+  ensureCruiseSelection();
+}
+
+async function loadCruiseOptionsByTripId(tripId){
+  try{
+    const data = await apiGet(`/api/cruise-options/by-trip/${encodeURIComponent(tripId)}`);
+    if(data.records && data.records.length){
+      cruiseOptions = data.records;
+      ensureCruiseSelection();
+    }
+  }catch(e){
+    console.warn("cruise options by trip fallback failed", e);
+  }
+}
+
+async function loadShowOptions(showIds){
+  try{
+    // 1. Fetch show (parent) records
+    const showData = await apiGet(`/api/shows-options?ids=${encodeURIComponent(showIds.join(","))}`);
+    const showRecs = showData.records || [];
+
+    // 2. Find category IDs — first from trip namedFields, then from show records
+    let catIds = tripCategoryRecordIds();
+    if(!catIds.length){
+      for(const show of showRecs){
+        const n = show.namedFields || {};
+        for(const key of ["קטגוריות מופעים","Categories","Ticket Categories","Tickets"]){
+          const ids = linkedRecordIds(n[key]);
+          if(ids.length){ catIds.push(...ids); break; }
+        }
+      }
+    }
+    catIds = [...new Set(catIds)];
+
+    // 3. Fetch category records
+    let catRecs = [];
+    if(catIds.length){
+      const catData = await apiGet(`/api/shows-options?ids=${encodeURIComponent(catIds.join(","))}`);
+      catRecs = catData.records || [];
+    }
+
+    if(catRecs.length && showRecs.length){
+      // ---- 2-level hierarchy ----
+      showOptions = catRecs;  // flat list for payment summary
+      showGroups  = showRecs.map(show=>{
+        const cats = catRecs.filter(cat=>{
+          const n = cat.namedFields || {};
+          // Try various link-back fields
+          const parentIds = [
+            ...linkedRecordIds(n["EventNane"]),
+            ...linkedRecordIds(n["MofaID"]),
+            ...linkedRecordIds(n["Show"]),
+            ...linkedRecordIds(n["מופע"]),
+          ];
+          return parentIds.includes(show.id);
+        });
+        return { show, categories: cats };
+      }).filter(g=>g.categories.length > 0);
+
+      // Orphan categories (no parent show matched) → add as a catch-all group
+      const usedCatIds = new Set(showGroups.flatMap(g=>g.categories.map(c=>c.id)));
+      const orphans = catRecs.filter(c=>!usedCatIds.has(c.id));
+      if(orphans.length){
+        showGroups.push({ show: null, categories: orphans });
+      }
+    } else {
+      // ---- Flat fallback (no category sub-records found) ----
+      showOptions = showRecs;
+      showGroups  = [];
+    }
+
+  }catch(e){
+    console.warn("show options fetch failed", e);
+  }
+}
+
+function textFromFieldValue(value){
+  if(value == null) return "";
+  if(typeof value === "string") return value.trim();
+  if(Array.isArray(value)){
+    if(!value.length) return "";
+    const first = value[0];
+    if(first && typeof first === "object"){
+      if(typeof first.url === "string") return first.url.trim();
+      if(typeof first.filename === "string" && typeof first.thumbnails === "object" && typeof first.url === "string") return first.url.trim();
+    }
+    return textFromFieldValue(value[0]);
+  }
+  if(typeof value === "object"){
+    if(typeof value.name === "string") return value.name.trim();
+    if(typeof value.value === "string") return value.value.trim();
+    if(typeof value.url === "string") return value.url.trim();
+  }
+  return "";
+}
+
+function tripNamedField(name){
+  return trip?.namedFields?.[name];
+}
+
+function linkedRecordIds(value){
+  if(!value) return [];
+
+  if(Array.isArray(value)){
+    if(!value.length) return [];
+
+    if(value.every((item)=>typeof item === "string" && item.startsWith("rec"))){
+      return value.filter(Boolean);
+    }
+
+    const objectIds = value
+      .map((item)=>item && typeof item === "object" ? item.id : "")
+      .filter((id)=>typeof id === "string" && id.startsWith("rec"));
+    if(objectIds.length) return objectIds;
+  }
+
+  if(typeof value === "string" && value.startsWith("rec")) return [value];
+  if(value && typeof value === "object" && typeof value.id === "string" && value.id.startsWith("rec")) return [value.id];
+
+  return [];
+}
+
+// מחזיר מזהי רשומות ברמת המופע (parent shows)
+function tripShowRecordIds(){
+  const direct = linkedRecordIds(trip?.fields?.[F.shows]);
+  if(direct.length) return direct;
+
+  const knownNames = ["מופעים","Shows","shows","Events","Performances","כרטיסים למופעים","כרטיסי מופעים","Shows Links"];
+  for(const name of knownNames){
+    const ids = linkedRecordIds(tripNamedField(name));
+    if(ids.length) return ids;
+  }
+
+  for(const [key, value] of Object.entries(trip?.namedFields || {})){
+    if(!/^מופעים$|^shows$/i.test(key)) continue;
+    const ids = linkedRecordIds(value);
+    if(ids.length) return ids;
+  }
+  return [];
+}
+
+// מחזיר מזהי רשומות ברמת הקטגוריה (ticket categories)
+function tripCategoryRecordIds(){
+  const knownNames = ["קישור לקטגוריות מופעים","קטגוריות מופעים","Categories","Ticket Categories","כרטיסים","סוגי כרטיסים"];
+  for(const name of knownNames){
+    const ids = linkedRecordIds(tripNamedField(name));
+    if(ids.length) return ids;
+  }
+  for(const [key, value] of Object.entries(trip?.namedFields || {})){
+    if(!/קטגור|category|ticket/i.test(key)) continue;
+    const ids = linkedRecordIds(value);
+    if(ids.length) return ids;
+  }
+  return [];
+}
+
+function tripBrochureUrl(){
+  const direct = tripNamedField("ברושור PDF של הטיול") || tripNamedField("PDF ברושור של הטיול") || tripNamedField("PDF ברושור") || tripNamedField("תכנית הטיול") || "";
+  return textFromFieldValue(direct);
+}
+
+function tripTypeName(){
+  const t = trip?.fields?.[F.tripType];
+  return textFromFieldValue(t);
+}
+
+function tripCurrency(){
+  const raw = (textFromFieldValue(trip?.fields?.[F.currency]) || "₪").trim();
+  const normalized = raw.toLowerCase();
+
+  if(raw === "₪" || normalized === "ils" || normalized === "nis" || normalized.includes("שקל")) return "₪";
+  if(raw === "€" || normalized === "eur" || normalized.includes("אירו") || normalized.includes("euro")) return "€";
+  if(raw === "$" || normalized === "usd" || normalized.includes("דולר") || normalized.includes("dollar")) return "$";
+  if(raw === "£" || normalized === "gbp" || normalized.includes("ליש")) return "£";
+
+  // Fallback: if Airtable already contains a symbol use it as-is.
+  if(["₪", "€", "$", "£"].includes(raw)) return raw;
+
+  // Final fallback keeps original value to avoid hiding unknown currencies.
+  return raw;
+}
+
+function numberFromField(value){
+  if(value == null) return 0;
+  if(typeof value === "number") return value;
+  const cleaned = String(value).replace(/[^0-9.-]/g, "");
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatTripAmount(value){
+  const n = numberFromField(value);
+  return `${new Intl.NumberFormat("he-IL").format(n)} ${tripCurrency()}`;
+}
+
+function cruiseOptionPrice(option){
+  return numberFromField(option?.fields?.[CRUISE_F.price]);
+}
+
+function cruiseNamedField(option, fieldName){
+  return option?.namedFields?.[fieldName];
+}
+
+function normalizeRegularTripCategory(value){
+  const text = textFromFieldValue(value).trim();
+  if(!text) return "";
+
+  if(text === "קטגוריה ראשית") return "קטגוריה ראשית";
+  if(text === "שדרוג") return "שדרוג";
+  if(text === "שנמוך") return "שנמוך";
+
+  const normalized = text.toLowerCase();
+  if(normalized.includes("ראשית") || normalized.includes("primary") || normalized.includes("main")) return "קטגוריה ראשית";
+  if(normalized.includes("שדרוג") || normalized.includes("upgrade")) return "שדרוג";
+  if(normalized.includes("שנמוך") || normalized.includes("downgrade")) return "שנמוך";
+
+  return text;
+}
+
+function sortedCruiseOptions(){
+  return [...cruiseOptions].sort((left, right) => cruiseOptionPrice(left) - cruiseOptionPrice(right));
+}
+
+function primaryCruiseOptionId(){
+  if(!cruiseOptions.length) return "";
+
+  const regularOption = cruiseOptions.find((option) =>
+    normalizeRegularTripCategory(cruiseNamedField(option, "RegularTripCategory")) === "קטגוריה ראשית"
+  );
+  if(regularOption) return regularOption.id;
+
+  const basePrice = numberFromField(trip?.fields?.[F.baseCost]);
+  if(basePrice <= 0) return sortedCruiseOptions()[0]?.id || "";
+
+  let bestOption = cruiseOptions[0];
+  let bestDelta = Math.abs(cruiseOptionPrice(bestOption) - basePrice);
+
+  for(const option of cruiseOptions.slice(1)){
+    const delta = Math.abs(cruiseOptionPrice(option) - basePrice);
+    if(delta < bestDelta){
+      bestOption = option;
+      bestDelta = delta;
+    }
+  }
+
+  return bestOption?.id || "";
+}
+
+function ensureCruiseSelection(){
+  if(state.cruise.roomOptionId) return;
+  const primaryId = primaryCruiseOptionId();
+  if(primaryId) state.cruise.roomOptionId = primaryId;
+}
+
+function cruiseTierLabel(option){
+  const directTier = normalizeRegularTripCategory(cruiseNamedField(option, "RegularTripCategory"));
+  if(directTier) return directTier;
+
+  const primaryId = primaryCruiseOptionId();
+  if(!primaryId) return "";
+  if(option.id === primaryId) return "קטגוריה ראשית";
+  return "קטגוריה חלופית";
+}
+
+function cruiseTierClass(option){
+  const tier = cruiseTierLabel(option);
+  if(tier === "קטגוריה ראשית") return "base";
+  if(tier === "שדרוג") return "upgrade";
+  if(tier === "שנמוך") return "downgrade";
+  return "";
+}
+
+function selectedCruiseOption(){
+  if(!state.cruise.roomOptionId) return null;
+  return cruiseOptions.find((o)=>o.id === state.cruise.roomOptionId) || null;
+}
+
+function firstTextValue(fields){
+  for(const key of Object.keys(fields || {})){
+    const v = fields[key];
+    if(typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
+}
+
+// --- Show field helpers ---
+
+// Returns true if a string looks like an Airtable record ID
+function isRecordId(v){ return typeof v === "string" && /^rec[a-zA-Z0-9]{14,}$/.test(v); }
+
+// Returns true if a value is a linked-record reference (we skip those as display text)
+function isLinkedValue(v){
+  if(isRecordId(v)) return true;
+  if(Array.isArray(v) && v.length && isRecordId(v[0])) return true;
+  if(Array.isArray(v) && v.length && v[0] && typeof v[0]==="object" && isRecordId(v[0]?.id)) return true;
+  return false;
+}
+
+// Extract a clean display string from any Airtable field value (skipping record-ID links)
+function showFieldText(value){
+  if(value == null) return "";
+  if(isLinkedValue(value)) return "";
+  return textFromFieldValue(value);
+}
+
+// Find the first namedField value whose key matches a pattern list, returning clean text
+function findNamed(showRecord, exactKeys=[], patterns=[]){
+  const named = showRecord?.namedFields || {};
+  for(const k of exactKeys){
+    const t = showFieldText(named[k]);
+    if(t) return t;
+  }
+  for(const [k, v] of Object.entries(named)){
+    if(patterns.some((p)=>p.test(k))){
+      const t = showFieldText(v);
+      if(t) return t;
+    }
+  }
+  return "";
+}
+
+// Collect all namedFields that have displayable non-ID text values,
+// as an array of {key, value} — used for "all info" display
+function showAllTextFields(showRecord){
+  const named = showRecord?.namedFields || {};
+  return Object.entries(named)
+    .map(([k, v])=>({ key: k, value: showFieldText(v) }))
+    .filter(({value})=>value);
+}
+
+// --- Show label from field IDs (primary lookup before namedFields) ---
+function showLabel(showRecord){
+  const fields = showRecord?.fields || {};
+  return fields[SHOW_F.alias] || fields[SHOW_F.name] || firstTextValue(fields) || showRecord?.id || "מופע";
+}
+
+// --- Main hierarchy extractor (מופע → קטגוריה) ---
+function showHierarchyInfo(showRecord){
+  // 1. Try to find the SHOW NAME (parent level) from namedFields
+  const showName = findNamed(showRecord,
+    ["מופע","שם מופע","שם ההופעה","הופעה","ארוע","אירוע","Show","Event","Show Name","Event Name"],
+    [/^מופע$/,/שם.*(מופע|הופעה|ארוע|אירוע)/i,/^show$/i,/^event/i]
+  );
+
+  // 2. Try to find the CATEGORY NAME (ticket type, child level)
+  const category = findNamed(showRecord,
+    ["קטגוריה","סוג כרטיס","סוג","רמה","דרגה","אזור","מחיר כרטיס",
+     "Category","Ticket Type","Ticket","Section","Tier","Level","Zone"],
+    [/קטגור/i,/סוג.?כרטיס/i,/^סוג$/i,/^רמה$/i,/^דרגה$/i,/^אזור$/i,
+     /^category$/i,/ticket.?type/i,/^ticket$/i,/^section$/i,/^tier$/i,/^level$/i,/^zone$/i]
+  );
+
+  // 3. Fallback: if only one of them resolved, use label-split as last resort
+  const baseLabel = showLabel(showRecord);
+  const sep = [" - "," | "," / "," – "].find((s)=>baseLabel.includes(s));
+  const splitParts = sep ? baseLabel.split(sep).map((p)=>p.trim()).filter(Boolean) : [];
+
+  const finalShowName   = showName   || (splitParts.length >= 2 ? splitParts[0] : baseLabel);
+  const finalCategory   = category   || (splitParts.length >= 2 ? splitParts.slice(1).join(" - ") : baseLabel);
+
+  return { showName: finalShowName, category: finalCategory };
+}
+
+// --- Per-show meta (used on the accordion header) ---
+function showDateInfo(showRecord){
+  return findNamed(showRecord,
+    ["תאריך","תאריך מופע","תאריך ההופעה","תאריכים","Date","Show Date","Event Date","Dates"],
+    [/תאריך/,/date/i]
+  );
+}
+function showPlaceInfo(showRecord){
+  return findNamed(showRecord,
+    ["מקום","אולם","מיקום","תיאטרון","Venue","Location","Hall","Theater","Theatre","Place"],
+    [/מקום/,/אולם/,/מיקום/,/venue/i,/location/i,/hall/i,/theat/i]
+  );
+}
+function showDescInfo(showRecord){
+  return findNamed(showRecord,
+    ["תיאור","תיאור מופע","פרטים","הערות","Description","Details","Notes","About"],
+    [/תיאור/,/פרטים/,/description/i,/details/i,/notes/i]
+  );
+}
+
+function showPrice(rec){
+  const fields = rec?.fields  || {};
+  const named  = rec?.namedFields || {};
+  // By field ID
+  if(fields[SHOW_F.price] != null) return numberFromField(fields[SHOW_F.price]);
+  // By common name patterns (handles real Airtable field names)
+  for(const k of ["Ticket price","Ticket Price","ticket price","Price","מחיר","מחיר כרטיס","עלות"]){
+    if(named[k] != null) return numberFromField(named[k]);
+  }
+  // Any number in namedFields
+  for(const v of Object.values(named)){
+    if(typeof v === "number" && v > 0) return numberFromField(v);
+  }
+  // Any number in fields
+  for(const v of Object.values(fields)){
+    if(typeof v === "number" && v > 0) return numberFromField(v);
+  }
+  return 0;
+}
+
+// Format date from ISO (2026-07-10) to European format (10/07/2026)
+function formatDateEuropean(isoDate){
+  if(!isoDate) return "";
+  const date = new Date(isoDate + "T00:00:00");
+  if(isNaN(date)) return isoDate;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function buildPaymentSummary(){
+  const travelers = Number(state.travelersCount || 1);
+  const basePerTraveler = numberFromField(trip?.fields?.[F.baseCost]);
+  const flightPerTraveler = numberFromField(trip?.fields?.[F.flightCost]);
+  const extraFixed = numberFromField(trip?.fields?.[F.extraCost]);
+
+  const components = [];
+  const notes = [];
+
+  function addComponent(label, quantity, unitAmount, amount, options = {}){
+    components.push({
+      label,
+      quantity,
+      unitAmount,
+      amount,
+      ...options
+    });
+  }
+
+  function addTravelerPricedComponent(label, primaryUnit, secondaryUnit = primaryUnit, options = {}){
+    const p1 = numberFromField(primaryUnit);
+    const p2 = numberFromField(secondaryUnit);
+
+    if(travelers <= 1){
+      addComponent(`${label} - נוסע ראשי`, 1, p1, p1, options);
+      return;
+    }
+
+    if(p1 === p2){
+      addComponent(label, travelers, p1, p1 * travelers, options);
+      return;
+    }
+
+    addComponent(`${label} - נוסע ראשי`, 1, p1, p1, options);
+    addComponent(`${label} - נוסע נוסף`, 1, p2, p2, options);
+  }
+
+  if(basePerTraveler > 0){
+    addTravelerPricedComponent("עלות בסיס", basePerTraveler, basePerTraveler);
+  }
+
+  if(state.independentFlight){
+    addComponent("עלות טיסה", travelers, 0, 0, { meta: "טיסה עצמאית" });
+  }else if(flightPerTraveler > 0){
+    addTravelerPricedComponent("עלות טיסה ומסים", flightPerTraveler, flightPerTraveler);
+  }else{
+    addComponent("עלות טיסה ומסים", travelers, 0, 0, { meta: "לא הוגדרה בטיול" });
+  }
+
+  const cruiseOption = selectedCruiseOption();
+  if(isCruiseTrip() && cruiseOption){
+    const cf = cruiseOption.fields || {};
+    const roomName = cf[CRUISE_F.alias] || cf[CRUISE_F.name] || "קטגוריית שייט";
+    const roomPrice = numberFromField(cf[CRUISE_F.price]);
+    const singleSupplement = numberFromField(cf[CRUISE_F.singleSupplement]);
+
+    if(roomPrice > 0){
+      const secondTravelerPrice = singleSupplement > 0 ? singleSupplement : roomPrice;
+      addTravelerPricedComponent(`קטגוריית שייט: ${roomName}`, roomPrice, secondTravelerPrice);
+    }
+  }
+
+  if(extraFixed !== 0){
+    addComponent("תוספות/מסים נוספים (מהגדרת הטיול)", 1, extraFixed, extraFixed, {
+      meta: "שדה תוספות/מסים מאיירטייבל"
+    });
+  }
+
+  const selectedShows = state.shows?.selected || {};
+  for(const showRec of showOptions){
+    const qty = numberFromField(selectedShows[showRec.id]);
+    if(qty <= 0) continue;
+    const unit = showPrice(showRec);
+    const info = showHierarchyInfo(showRec);
+    addComponent(`כרטיס מופע: ${info.showName} - ${info.ticketType}`, qty, unit, unit * qty);
+  }
+
+  const estimatedTotal = components.reduce((sum, c)=>sum + numberFromField(c.amount), 0);
+
+  return { travelers, components, estimatedTotal, notes };
+}
+
+function isCruiseTrip(){
+  const typeName = tripTypeName();
+  const hasCruiseInTypeName = typeName.includes("שייט");
+  const hasCruiseLinkField = !!(trip?.fields?.[F.cruiseLinks] && trip.fields[F.cruiseLinks].length);
+  const match = hasCruiseInTypeName || CRUISE_TRIP_TYPES.includes(typeName) || hasCruiseLinkField || cruiseOptions.length > 0;
+  console.log("[debug] trip type:", JSON.stringify(tripTypeName()), "→ isCruiseTrip:", match);
+  return match;
+}
+function hasShows(){ return tripShowRecordIds().length > 0 || showOptions.length > 0; }
+
+/* ======================================================================
+   Steps definition
+   ====================================================================== */
+function buildSteps(){
+  steps = [];
+  steps.push({ id:"personal", title:"פרטים אישיים", render:renderPersonalStep, validate:validatePersonalStep });
+  steps.push({ id:"address", title:"כתובת ותקשורת", render:renderAddressStep, validate:validateAddressStep });
+  steps.push({ id:"flight", title:"העדפות בטיסה", render:renderFlightStep, validate:()=>true });
+  if(isCruiseTrip()){
+    steps.push({ id:"cruise", title:"הרשמה לשייט", render:renderCruiseStep, validate:validateCruiseStep });
+  }
+  if(hasShows()){
+    steps.push({ id:"shows", title:"מופעים", render:renderShowsStep, validate:()=>true });
+  }
+  steps.push({ id:"consents", title:"הסכמות ואישורים", render:renderConsentsStep, validate:validateConsentsStep });
+  steps.push({ id:"payment", title:"סיכום לתשלום", render:renderPaymentStep, validate:validatePaymentStep });
+}
+
+/* ======================================================================
+   App shell render
+   ====================================================================== */
+function renderFatalError(msg){
+  document.getElementById("app").innerHTML = `
+    <div class="card" style="margin-top:40px;">
+      <div class="alert-box">${msg}</div>
+    </div>`;
+}
+
+function renderApp(){
+  const app = document.getElementById("app");
+  const step = steps[currentStepIndex];
+
+  const segs = steps.map((s,i)=>{
+    const cls = i < currentStepIndex ? "done" : (i===currentStepIndex ? "active" : "");
+    return `<div class="progress-seg ${cls}"></div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="top-utility">
+      <div class="demo-strip">
+        <span>מצב דמו: <b>${demoPrefillEnabled ? "פעיל" : "כבוי"}</b> · ${demoPrefillEnabled ? "מילוי אוטומטי לבדיקה" : "מילוי ידני"}</span>
+        <div class="config-actions">
+          <button type="button" class="mini-btn ${demoPrefillEnabled ? "active" : ""}" id="demoOnBtn">הפעל דמו</button>
+          <button type="button" class="mini-btn ${!demoPrefillEnabled ? "active" : ""}" id="demoOffBtn">נקה דמו</button>
+        </div>
+      </div>
+      ${usingDefaultTripId ? `<div class="trip-warning">⚠️ לא צוין מזהה טיול בקישור (?id=) — מוצג טיול דמו לבדיקה (${CONFIG.DEFAULT_TRIP_ID}).</div>` : ""}
+    </div>
+    <div class="trip-header">
+      <div class="trip-header-main">
+        <div class="trip-heading-row">
+          <div class="trip-heading-copy">
+            <p class="trip-eyebrow">הרשמה לטיול</p>
+            <h1 class="trip-name">${trip.fields[F.name] || ""}</h1>
+          </div>
+          <div class="trip-logo-wrap">
+            <img class="trip-logo-embed" src="logo.jpg" alt="לוגו קשרי תרבות תבל" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="trip-meta">
+          ${trip.fields[F.departDate] ? `<span>🛫 יציאה: ${trip.fields[F.departDate]}</span>`:""}
+          ${trip.fields[F.returnDate] ? `<span>🛬 חזרה: ${trip.fields[F.returnDate]}</span>`:""}
+          ${tripTypeName() ? `<span>🏷️ ${tripTypeName()}</span>`:""}
+        </div>
+        <div class="progress-row">${segs}</div>
+        <div class="step-label">שלב <b>${currentStepIndex+1}</b> מתוך ${steps.length} — ${step.title}</div>
+      </div>
+    </div>
+    <div class="card" id="stepCard"></div>
+  `;
+  document.getElementById("demoOnBtn").onclick = ()=> setDemoMode(true);
+  document.getElementById("demoOffBtn").onclick = ()=> setDemoMode(false);
+  step.render(document.getElementById("stepCard"));
+}
+
+function goNext(){
+  const step = steps[currentStepIndex];
+  if(step.validate && !step.validate()) return;
+  if(currentStepIndex < steps.length-1){
+    currentStepIndex++;
+    renderApp();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    submitForm();
+  }
+}
+function goBack(){
+  if(currentStepIndex>0){
+    currentStepIndex--;
+    renderApp();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+}
+
+function navButtons(container, opts={}){
+  const step = steps[currentStepIndex];
+  const nextStep = steps[currentStepIndex + 1];
+
+  function nextButtonText(){
+    if(currentStepIndex === steps.length - 1) return "אישור ושליחת הזמנה לטיול בחו\"ל";
+    if(step.id === "flight") return "ממשיכים לבחירות הטיול בחו\"ל";
+    if(step.id === "consents") return "ממשיכים לסיכום תשלום וטיסות";
+    if(nextStep?.id === "flight") return "ממשיכים להעדפות טיסה";
+    if(nextStep?.id === "payment") return "ממשיכים לסיכום המסע";
+    return `ממשיכים ל${nextStep?.title || "השלב הבא"}`;
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "nav-row";
+  if(currentStepIndex>0){
+    const back = document.createElement("button");
+    back.className = "btn-ghost";
+    back.textContent = "חזרה לשלב הקודם";
+    back.onclick = goBack;
+    wrap.appendChild(back);
+  }
+  const next = document.createElement("button");
+  next.className = "btn-primary";
+  next.textContent = nextButtonText();
+  next.onclick = goNext;
+  wrap.appendChild(next);
+  container.appendChild(wrap);
+}
+
+/* ======================================================================
+   Step: פרטים אישיים
+   ====================================================================== */
+// Validators for personal fields
+function isValidHebrewName(name){
+  if(!name || !name.trim()) return false;
+  // Only Hebrew letters (Unicode range) and spaces
+  return /^[\u05D0-\u05EA\s]+$/.test(name.trim());
+}
+
+function isValidEnglishName(name){
+  if(!name || !name.trim()) return false;
+  // Only English letters, hyphens, and spaces (allow common patterns like Jean-Paul)
+  return /^[a-zA-Z\s\-']+$/.test(name.trim());
+}
+
+function isValidPassportNumber(num){
+  if(!num || !num.trim()) return false;
+  // Only digits
+  return /^\d+$/.test(num.trim());
+}
+
+function passportExpiryWarning(expiryDate){
+  if(!expiryDate || !trip || !trip.fields || !trip.fields[F.departDate]) {
+    return "";
+  }
+  
+  // Parse dates
+  const expiry = new Date(expiryDate);
+  const departDateStr = trip.fields[F.departDate];
+  const depart = new Date(departDateStr);
+  
+  console.log("DEBUG passport check:", {expiryDate, departDateStr, expiry: expiry.toISOString(), depart: depart.toISOString()});
+  
+  // Valid date check
+  if(isNaN(expiry.getTime()) || isNaN(depart.getTime())) {
+    console.log("DEBUG: Invalid dates");
+    return "";
+  }
+  
+  // Warn if expiry is less than 6 months after departure
+  const sixMonthsAfter = new Date(depart);
+  sixMonthsAfter.setMonth(sixMonthsAfter.getMonth() + 6);
+  
+  console.log("DEBUG six months check:", {expiry: expiry.toISOString(), sixMonthsAfter: sixMonthsAfter.toISOString(), isLess: expiry < sixMonthsAfter});
+  
+  if(expiry < sixMonthsAfter){
+    const expiryStr = expiry.toLocaleDateString("he-IL");
+    const departStr = depart.toLocaleDateString("he-IL");
+    return `⚠️ דרכון תוקף עד ${expiryStr}. לשתתוף בטיול ביום ${departStr}, הדרכון חייב להיות בתוקף לפחות 6 חודשים. אם הדרכון לא עומד בתנאי זה, יש להנפיק או לחדש דרכון בתוקף מתאים.`;
+  }
+  return "";
+}
+
+function travelerFieldsHtml(idx){
+  const t = state.travelers[idx];
+  const passportWarning = passportExpiryWarning(t.passportExpiry);
+  return `
+    <div class="field">
+      <label>שם מלא (בעברית) <span class="req">*</span></label>
+      <input type="text" data-bind="travelers.${idx}.fullNameHe" value="${t.fullNameHe}" placeholder="רק אותיות בעברית" data-validate-type="hebrew-name" id="fullNameHe_${idx}">
+      <div id="err_fullNameHe_${idx}" class="error-msg"></div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>First Name (כפי שמופיע בדרכון) <span class="req">*</span></label>
+        <input type="text" data-bind="travelers.${idx}.firstNameEn" value="${t.firstNameEn}" placeholder="English only" data-validate-type="english-name" id="firstNameEn_${idx}">
+        <div id="err_firstNameEn_${idx}" class="error-msg"></div>
+      </div>
+      <div class="field">
+        <label>Last Name (כפי שמופיע בדרכון) <span class="req">*</span></label>
+        <input type="text" data-bind="travelers.${idx}.lastNameEn" value="${t.lastNameEn}" placeholder="English only" data-validate-type="english-name" id="lastNameEn_${idx}">
+        <div id="err_lastNameEn_${idx}" class="error-msg"></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>מספר דרכון <span class="req">*</span></label>
+        <input type="text" data-bind="travelers.${idx}.passportNum" value="${t.passportNum}" placeholder="מספרים בלבד" data-validate-type="passport-num" id="passportNum_${idx}">
+        <div id="err_passportNum_${idx}" class="error-msg"></div>
+      </div>
+      <div class="field">
+        <label>תוקף דרכון <span class="req">*</span></label>
+        <input type="date" data-bind="travelers.${idx}.passportExpiry" value="${t.passportExpiry}" id="passportExpiry_${idx}">
+      </div>
+    </div>
+    ${passportWarning ? `<div class="alert-box" style="margin:8px 0;">${passportWarning}</div>` : ""}
+    <div class="row2">
+      <div class="field">
+        <label>תאריך לידה <span class="req">*</span></label>
+        <input type="date" data-bind="travelers.${idx}.dob" value="${t.dob}"></div>
+      <div class="field">
+        <label>מקצוע</label>
+        <input type="text" data-bind="travelers.${idx}.profession" value="${t.profession}"></div>
+    </div>
+  `;
+}
+
+function renderPersonalStep(container){
+  container.innerHTML = `
+    <h2>מי יוצא לטיול?</h2>
+    <p class="sub">בחרו מספר מטיילים והזינו את פרטי הדרכון של כל אחד</p>
+    <div class="choice-grid">
+      <div class="choice-card ${state.travelersCount==="1"?"selected":""}" data-count="1">מטייל אחד</div>
+      <div class="choice-card ${state.travelersCount==="2"?"selected":""}" data-count="2">שני מטיילים</div>
+    </div>
+    <div class="section-title">מטייל 1</div>
+    <div id="trav1">${travelerFieldsHtml(0)}</div>
+    <div id="trav2Wrap" style="${state.travelersCount==="2"?"":"display:none"}">
+      <div class="section-title">מטייל 2</div>
+      <div id="trav2">${travelerFieldsHtml(1)}</div>
+    </div>
+  `;
+  container.querySelectorAll(".choice-card").forEach(c=>{
+    c.onclick = ()=>{
+      state.travelersCount = c.dataset.count;
+      renderPersonalStep(container);
+    };
+  });
+  bindInputs(container);
+  
+  // Add real-time validation listeners
+  container.querySelectorAll("[data-validate-type]").forEach(input => {
+    input.addEventListener("blur", () => {
+      const type = input.dataset.validateType;
+      const value = input.value;
+      const errorDiv = document.getElementById("err_" + input.id);
+      if(!errorDiv) return;
+      
+      let isValid = true;
+      let errorMsg = "";
+      
+      if(value){
+        if(type === "hebrew-name"){
+          isValid = isValidHebrewName(value);
+          if(!isValid) errorMsg = "⚠️ שם בעברית חייב להכיל רק אותיות בעברית";
+        }else if(type === "english-name"){
+          isValid = isValidEnglishName(value);
+          if(!isValid) errorMsg = "⚠️ שם באנגלית חייב להכיל רק אותיות באנגלית";
+        }else if(type === "passport-num"){
+          isValid = isValidPassportNumber(value);
+          if(!isValid) errorMsg = "⚠️ מספר דרכון חייב להכיל מספרים בלבד";
+        }
+      }
+      
+      errorDiv.textContent = errorMsg;
+      errorDiv.style.color = "#d32f2f";
+      errorDiv.style.fontSize = "12px";
+      errorDiv.style.marginTop = "4px";
+    });
+  });
+  
+  navButtons(container);
+}
+
+function validatePersonalStep(){
+  const need = ["fullNameHe","firstNameEn","lastNameEn","passportNum","passportExpiry","dob"];
+  const count = parseInt(state.travelersCount,10);
+  
+  for(let i=0;i<count;i++){
+    const trav = state.travelers[i];
+    
+    // 1. Check all required fields are filled
+    for(const f of need){
+      if(!trav[f]){
+        alert(`נא למלא את כל השדות החיוניים למטייל ${i+1}`);
+        return false;
+      }
+    }
+    
+    // 2. Validate Hebrew name (only Hebrew letters and spaces)
+    if(!isValidHebrewName(trav.fullNameHe)){
+      alert(`מטייל ${i+1}: שם מלא בעברית חייב להכיל רק אותיות בעברית. בדוק שנכתב בעברית בלבד.`);
+      return false;
+    }
+    
+    // 3. Validate English first name (only English letters, spaces, hyphens)
+    if(!isValidEnglishName(trav.firstNameEn)){
+      alert(`מטייל ${i+1}: First name חייב להכיל רק אותיות באנגלית (כפי שמופיע בדרכון).`);
+      return false;
+    }
+    
+    // 4. Validate English last name (only English letters, spaces, hyphens)
+    if(!isValidEnglishName(trav.lastNameEn)){
+      alert(`מטייל ${i+1}: Last name חייב להכיל רק אותיות באנגלית (כפי שמופיע בדרכון).`);
+      return false;
+    }
+    
+    // 5. Validate passport number (only digits)
+    if(!isValidPassportNumber(trav.passportNum)){
+      alert(`מטייל ${i+1}: מספר דרכון חייב להכיל מספרים בלבד.`);
+      return false;
+    }
+  }
+  
+  // All validations passed
+  return true;
+}
+
+/* ======================================================================
+   Step: העדפות בטיסה
+   ====================================================================== */
+function flightFieldsHtml(idx){
+  const t = state.travelers[idx];
+  return `
+    <div class="field"><label>ארוחה בטיסה</label>
+      <select data-bind="travelers.${idx}.meal">
+        <option value="">בחר/י</option>
+        <option ${t.meal==="רגילה"?"selected":""}>רגילה</option>
+        <option ${t.meal==="צמחונית"?"selected":""}>צמחונית</option>
+        <option ${t.meal==="טבעונית"?"selected":""}>טבעונית</option>
+        <option ${t.meal==="ללא גלוטן"?"selected":""}>ללא גלוטן</option>
+        <option ${t.meal==="כשרה"?"selected":""}>כשרה</option>
+      </select></div>
+    <div class="row2">
+      <div class="field"><label>מספר נוסע מתמיד</label>
+        <input type="text" data-bind="travelers.${idx}.frequentFlyer" value="${t.frequentFlyer}"></div>
+      <div class="field"><label>בקשת מושב</label>
+        <select data-bind="travelers.${idx}.seat">
+          <option value="">בחר/י</option>
+          <option ${t.seat==="חלון"?"selected":""}>חלון</option>
+          <option ${t.seat==="מעבר"?"selected":""}>מעבר</option>
+          <option ${t.seat==="אמצע"?"selected":""}>אמצע</option>
+        </select></div>
+    </div>
+    <div class="field"><label>בקשות נוספות/מיוחדות בטיסה</label>
+      <textarea rows="2" data-bind="travelers.${idx}.flightRequests">${t.flightRequests}</textarea></div>
+    <div class="info-box" style="margin-bottom:16px;">
+      <div style="font-weight:600; margin-bottom:6px;">שדרוג למושב מועדף או למחלקת עסקים - בתשלום נוסף</div>
+      <div style="margin-bottom:8px;">(המחיר דינאמי בהתאם לזמינות ומועד הכרטוס בכפוף לתנאים הרשומים בתכנית הטיול)</div>
+      <div style="font-weight:600;">יש לפנות למשרד</div>
+    </div>
+  `;
+}
+
+function renderFlightStep(container){
+  const count = parseInt(state.travelersCount,10);
+  container.innerHTML = `
+    <h2>העדפות בטיסה</h2>
+    <p class="sub">פרטי הטיסה הקבוצתית עבור המטיילים</p>
+
+    <div class="switch-row">
+      <span class="lbl">אני מטפל/ת בהזמנת הטיסה באופן עצמאי (לא מצטרף/ת לטיסת הקבוצה)</span>
+      <label class="switch"><input type="checkbox" id="independentFlight" ${state.independentFlight?"checked":""}><span class="slider"></span></label>
+    </div>
+    
+    <div id="independentFlightNotice" class="info-box" style="display:${state.independentFlight?"block":"none"}; margin-bottom:20px;">
+      <div style="font-weight:600; margin-bottom:8px;">רכישת כרטיס טיסה באופן עצמאי</div>
+      <div>בבחירה זו לא יוצגו אפשרויות הטיסה של הטיול, והטיפול ברכישת כרטיס הטיסה ובתיאום מועדי ההגעה יהיה באחריות המטייל.</div>
+    </div>
+    
+    <div id="flightDetailsWrap" style="${state.independentFlight?"display:none":""}">
+      <div class="section-title">מטייל 1</div>
+      ${flightFieldsHtml(0)}
+      ${count===2?`<div class="section-title">מטייל 2</div>${flightFieldsHtml(1)}`:""}
+    </div>
+
+    <div class="switch-row">
+      <span class="lbl">אני מעוניין/ת שיפנו אליי עם הצעה לביטוח נסיעות</span>
+      <label class="switch"><input type="checkbox" id="insuranceOptIn" ${state.insuranceOptIn?"checked":""}><span class="slider"></span></label>
+    </div>
+  `;
+  bindInputs(container);
+  container.querySelector("#independentFlight").onchange = (e)=>{
+    state.independentFlight = e.target.checked;
+    document.getElementById("flightDetailsWrap").style.display = e.target.checked ? "none":"";
+    document.getElementById("independentFlightNotice").style.display = e.target.checked ? "block":"none";
+  };
+  container.querySelector("#insuranceOptIn").onchange = (e)=>{ state.insuranceOptIn = e.target.checked; };
+  navButtons(container);
+}
+
+/* ======================================================================
+   Step: הרשמה לשייט (מותנה)
+   ====================================================================== */
+function renderCruiseStep(container){
+  ensureCruiseSelection();
+  const primaryId = primaryCruiseOptionId();
+  const optionsHtml = cruiseOptions.length ? sortedCruiseOptions().map(o=>{
+    const f = o.fields;
+    const name = f[CRUISE_F.alias] || f[CRUISE_F.name] || "אופציה";
+    const price = f[CRUISE_F.price] ? formatTripAmount(f[CRUISE_F.price]) : "";
+    const sel = state.cruise.roomOptionId === o.id;
+    const tier = cruiseTierLabel(o);
+    const tierClass = cruiseTierClass(o);
+    const details = [];
+    if(tier) details.push({ k:"סוג קטגוריה", v:tier });
+    if(f[CRUISE_F.category]) details.push({ k:"קטגוריה", v:String(f[CRUISE_F.category]) });
+    if(f[CRUISE_F.cabinSize]) details.push({ k:"גודל תא", v:String(f[CRUISE_F.cabinSize]) });
+    if(f[CRUISE_F.price]) details.push({ k:"מחיר", v:formatTripAmount(f[CRUISE_F.price]) });
+    if(f[CRUISE_F.singleSupplement]) details.push({ k:"תוספת ליחיד", v:formatTripAmount(f[CRUISE_F.singleSupplement]) });
+
+    const detailsHtml = sel && details.length ? `
+      <div class="room-details">
+        ${details.map(d=>`<div class="room-detail-row"><span class="k">${d.k}</span><span>${d.v}</span></div>`).join("")}
+      </div>
+      <div class="room-selected-note">${o.id === primaryId ? "הקטגוריה הראשית נבחרה כברירת מחדל" : "קטגוריה נבחרה"}</div>
+    ` : "";
+
+    return `<div class="room-option ${sel?"selected":""} ${tierClass ? `is-${tierClass}` : ""}" data-id="${o.id}">
+      <div class="room-main"><div class="room-title"><span class="name">${name}</span>${tier ? `<span class="room-badge ${tierClass}">${tier}</span>` : ""}</div><span class="price">${price}</span></div>
+        ${detailsHtml}
+      </div>`;
+  }).join("") : `<p class="hint">לא נמצאו אפשרויות תא לטיול זה — ניתן להמשיך, ונחזור אליכם בנושא.</p>`;
+
+  container.innerHTML = `
+    <h2>הרשמה לשייט</h2>
+    <p class="sub">בחרו את סוג התא המועדף</p>
+    <div id="roomList">${optionsHtml}</div>
+
+    <div class="switch-row">
+      <span class="lbl">מעוניין/ת בשותף/ת לחדר</span>
+      <label class="switch"><input type="checkbox" id="wantsRoommate" ${state.cruise.wantsRoommate?"checked":""}><span class="slider"></span></label>
+    </div>
+    <div class="field" id="roommateNameWrap" style="${state.cruise.wantsRoommate?"":"display:none"}">
+      <label>שם השותף/ה</label>
+      <input type="text" data-bind="cruise.roommateName" value="${state.cruise.roommateName}">
+    </div>
+    <div class="field"><label>בחדר האוכל בספינה מבקש/ת לשבת עם (עד 6 איש בשולחן)</label>
+      <textarea rows="2" data-bind="cruise.diningTable">${state.cruise.diningTable}</textarea></div>
+  `;
+  container.querySelectorAll(".room-option").forEach(el=>{
+    el.onclick = ()=>{ state.cruise.roomOptionId = el.dataset.id; renderCruiseStep(container); };
+  });
+  bindInputs(container);
+  container.querySelector("#wantsRoommate").onchange = (e)=>{
+    state.cruise.wantsRoommate = e.target.checked;
+    document.getElementById("roommateNameWrap").style.display = e.target.checked? "":"none";
+  };
+  navButtons(container);
+}
+function validateCruiseStep(){
+  if(cruiseOptions.length && !state.cruise.roomOptionId){
+    alert("נא לבחור סוג תא");
+    return false;
+  }
+  return true;
+}
+
+/* ======================================================================
+   Step: מופעים (מותנה)
+   ====================================================================== */
+function renderShowsStep(container){
+  const selected = state.shows.selected || {};
+
+  /* ---- helpers ---- */
+  function catLabel(cat){
+    const n = cat.namedFields || {};
+    // "Category" field might be "1","2","3" or "VIP","Standard" etc.
+    const cat_ = showFieldText(n["Category"] || n["\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4"] || n["Tier"] || n["Level"] || n["Section"] || n["\u05e1\u05d5\u05d2"] || n["\u05e8\u05de\u05d4"]);
+    if(cat_) return "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 " + cat_;
+    // Fall back to the record Name minus the show name prefix
+    const name = showFieldText(n["Name"] || n["\u05e9\u05dd"]);
+    if(name) return name;
+    return "\u05db\u05e8\u05d8\u05d9\u05e1";
+  }
+
+  function catCapacity(cat){
+    const n = cat.namedFields || {};
+    for(const k of ["Total tickets for sale","Capacity","\u05e7\u05d9\u05d1\u05d5\u05dc\u05ea","\u05de\u05e1\u05e4\u05e8 \u05de\u05e7\u05d5\u05de\u05d5\u05ea"])
+      if(n[k] != null) return numberFromField(n[k]);
+    return 0;
+  }
+
+  function catStatus(cat){
+    const n = cat.namedFields || {};
+    return showFieldText(n["Status"] || n["\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1"] || n["\u05d6\u05de\u05d9\u05e0\u05d5\u05ea"] || "");
+  }
+
+  function catExtraFields(cat){
+    const skip = new Set(["Name","\u05e9\u05dd","Category","\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4","Tier","Level","Section","\u05e1\u05d5\u05d2","\u05e8\u05de\u05d4",
+      "Ticket price","Ticket Price","Price","\u05de\u05d7\u05d9\u05e8","\u05de\u05d7\u05d9\u05e8 \u05db\u05e8\u05d8\u05d9\u05e1","\u05e2\u05dc\u05d5\u05ea",
+      "Total tickets for sale","Capacity","\u05e7\u05d9\u05d1\u05d5\u05dc\u05ea","\u05de\u05e1\u05e4\u05e8 \u05de\u05e7\u05d5\u05de\u05d5\u05ea",
+      "Status","\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1","\u05d6\u05de\u05d9\u05e0\u05d5\u05ea",
+      "RecordID","EventNane","MofaID","Show","\u05de\u05d5\u05e4\u05e2","Project","\u05de\u05d6\u05d4\u05d4 \u05e4\u05e8\u05d5\u05d9\u05d9\u05e7\u05d8",
+      "\u05e9\u05dd \u05e4\u05e8\u05d5\u05d9\u05d9\u05e7\u05d8 (from Project)","EventNane (from EventNane)"]);
+    return showAllTextFields(cat).filter(({key})=>!skip.has(key));
+  }
+
+  function showSelCount(categories){
+    return categories.filter(c=>numberFromField(selected[c.id]) > 0).length;
+  }
+
+  /* ---- build HTML ---- */
+  function buildCategoryCard(cat){
+    const checked   = numberFromField(selected[cat.id]) > 0;
+    const qty       = checked ? numberFromField(selected[cat.id]) : (Number(state.travelersCount||1)||1);
+    const unit      = showPrice(cat);
+    const lineTotal = checked ? unit * qty : 0;
+    const label     = catLabel(cat);
+    const capacity  = catCapacity(cat);
+    const status    = catStatus(cat);
+    const extras    = catExtraFields(cat);
+
+    return `
+      <div class="room-option show-ticket ${checked?"selected":""}" data-show-id="${cat.id}">
+        <div class="show-ticket-main">
+          <span class="show-ticket-title">${label}</span>
+          <span class="show-ticket-price">${unit > 0 ? formatTripAmount(unit) : "\u05de\u05d7\u05d9\u05e8 \u05d9\u05d9\u05e7\u05d1\u05e2 \u05d1\u05d4\u05de\u05e9\u05da"}</span>
+        </div>
+        <div class="room-details" style="display:block;">
+          ${status    ? `<div class="room-detail-row"><span class="k">\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1</span><span>${status}</span></div>` : ""}
+          ${capacity  ? `<div class="room-detail-row"><span class="k">\u05de\u05e7\u05d5\u05de\u05d5\u05ea \u05d6\u05de\u05d9\u05e0\u05d9\u05dd</span><span>${capacity}</span></div>` : ""}
+          ${extras.map(({key,value})=>`<div class="room-detail-row"><span class="k">${key}</span><span class="show-detail-text">${value}</span></div>`).join("")}
+          <div class="room-detail-row" style="margin-top:8px;">
+            <label class="show-ticket-check">
+              <input type="checkbox" class="show-check" data-show-id="${cat.id}" ${checked?"checked":""}>
+              <span>${checked ? "\u2713 \u05e0\u05d1\u05d7\u05e8" : "\u05d1\u05d7\u05e8 \u05e1\u05d5\u05d2 \u05db\u05e8\u05d8\u05d9\u05e1 \u05d6\u05d4"}</span>
+            </label>
+          </div>
+          <div class="room-detail-row">
+            <span class="k">\u05db\u05de\u05d5\u05ea \u05db\u05e8\u05d8\u05d9\u05e1\u05d9\u05dd</span>
+            <input type="number" min="1" step="1" class="show-qty show-qty-input"
+              data-show-id="${cat.id}" value="${qty>0?qty:1}" ${checked?"":"disabled"}>
+          </div>
+          <div class="room-detail-row">
+            <span class="k">\u05e1\u05db\u05d5\u05dd</span>
+            <span style="font-weight:${checked&&unit>0?"700":"400"}">${checked&&unit>0 ? formatTripAmount(lineTotal) : "\u2014"}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function buildGroupCard(showRec, categories, groupKey){
+    const n       = showRec?.namedFields || {};
+    const showName= showFieldText(n["EventNane"]||n["\u05e9\u05dd \u05de\u05d5\u05e4\u05e2"]||n["Name"]||n["Event"]) || groupKey;
+    const date_   = showFieldText(n["EventDate"]||n["\u05ea\u05d0\u05e8\u05d9\u05da"]||n["Date"]);
+    const venue_  = showFieldText(n["EventVenue"]||n["\u05d0\u05d5\u05dc\u05dd"]||n["\u05de\u05e7\u05d5\u05dd"]||n["Venue"]);
+    const desc_   = showFieldText(n["Description"]||n["\u05ea\u05d9\u05d0\u05d5\u05e8"]||n["Notes"]);
+    const status_ = showFieldText(n["Status"]||n["\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1"]);
+    const isOpen  = state.shows.expandedShow === groupKey;
+    const selCnt  = showSelCount(categories);
+    const ticketsHtml = categories.map(buildCategoryCard).join("");
+
+    return `
+      <section class="show-group ${isOpen?"open":""}" data-show-group="${groupKey}">
+        <button type="button" class="show-group-head" data-show-group-toggle="${groupKey}">
+          <div class="show-group-head-left">
+            <h3 class="show-group-title">${showName}</h3>
+            <div class="show-group-meta">
+              ${date_   ? `<span class="show-meta-chip">\uD83D\uDCC5 ${date_}</span>`   : ""}
+              ${venue_  ? `<span class="show-meta-chip">\uD83D\uDCCD ${venue_}</span>`  : ""}
+              ${status_ ? `<span class="show-meta-chip">${status_}</span>`  : ""}
+              ${desc_   ? `<span class="show-meta-chip">\u2139\uFE0F ${desc_}</span>`   : ""}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            ${selCnt > 0
+              ? `<span class="show-group-sub" style="background:#f0e8ed;color:#7c1836;border-color:#d4afc0;">\u2713 ${selCnt} \u05e0\u05d1\u05d7\u05e8\u05d5</span>`
+              : `<span class="show-group-sub">${categories.length} \u05e1\u05d5\u05d2\u05d9 \u05db\u05e8\u05d8\u05d9\u05e1\u05d9\u05dd</span>`}
+            <span class="show-group-arrow">\u25BE</span>
+          </div>
+        </button>
+        <div class="show-group-body">
+          <div class="show-tickets">${ticketsHtml}</div>
+        </div>
+      </section>`;
+  }
+
+  /* ---- decide which data to render ---- */
+  let listHtml = "";
+
+  if(showGroups.length){
+    // Full hierarchy
+    listHtml = showGroups.map(({show, categories})=>
+      buildGroupCard(show, categories, show?.id || categories[0]?.id || "group")
+    ).join("") || `<p class="hint">\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05de\u05d5\u05e4\u05e2\u05d9\u05dd \u05dc\u05d8\u05d9\u05d5\u05dc \u05d6\u05d4.</p>`;
+  } else if(showOptions.length){
+    // Flat fallback: group by showHierarchyInfo
+    const groups = new Map();
+    for(const rec of showOptions){
+      const info = showHierarchyInfo(rec);
+      const key  = info.showName || rec.id;
+      if(!groups.has(key)) groups.set(key, { show: null, categories: [] });
+      groups.get(key).categories.push(rec);
+    }
+    listHtml = Array.from(groups.entries()).map(([key, {show, categories}])=>
+      buildGroupCard(show, categories, key)
+    ).join("") || `<p class="hint">\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05db\u05e8\u05d8\u05d9\u05e1\u05d9\u05dd \u05dc\u05d8\u05d9\u05d5\u05dc \u05d6\u05d4.</p>`;
+  } else {
+    listHtml = `<p class="hint">\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05de\u05d5\u05e4\u05e2\u05d9\u05dd \u05dc\u05d8\u05d9\u05d5\u05dc \u05d6\u05d4.</p>`;
+  }
+
+  container.innerHTML = `
+    <h2>\u05de\u05d5\u05e4\u05e2\u05d9\u05dd \u05d5\u05d4\u05d5\u05e4\u05e2\u05d5\u05ea</h2>
+    <p class="sub">\u05dc\u05d7\u05e6\u05d5 \u05e2\u05dc \u05de\u05d5\u05e4\u05e2 \u05db\u05d3\u05d9 \u05dc\u05e8\u05d0\u05d5\u05ea \u05d0\u05ea \u05e1\u05d5\u05d2\u05d9 \u05d4\u05db\u05e8\u05d8\u05d9\u05e1\u05d9\u05dd \u05d5\u05dc\u05d1\u05d7\u05d5\u05e8</p>
+    <div id="showsList" class="shows-groups">${listHtml}</div>
+    <div class="field" style="margin-top:18px;"><label>\u05d4\u05e2\u05e8\u05d5\u05ea \u05dc\u05d2\u05d1\u05d9 \u05de\u05d5\u05e4\u05e2\u05d9\u05dd</label>
+      <textarea rows="3" data-bind="shows.notes">${state.shows.notes || ""}</textarea></div>
+  `;
+
+  container.querySelectorAll(".show-check").forEach((el)=>{
+    el.onchange = (e)=>{
+      const id = e.target.dataset.showId;
+      if(e.target.checked){
+        state.shows.selected[id] = Number(state.travelersCount || 1) || 1;
+      }else{
+        delete state.shows.selected[id];
+      }
+      renderShowsStep(container);
+    };
+  });
+
+  container.querySelectorAll(".show-qty").forEach((el)=>{
+    el.oninput = (e)=>{
+      const id = e.target.dataset.showId;
+      const qty = Math.max(1, Math.floor(numberFromField(e.target.value) || 1));
+      state.shows.selected[id] = qty;
+      renderShowsStep(container);
+    };
+  });
+
+  container.querySelectorAll("[data-show-group-toggle]").forEach((el)=>{
+    el.onclick = ()=>{
+      const groupKey = el.dataset.showGroupToggle;
+      state.shows.expandedShow = state.shows.expandedShow === groupKey ? "" : groupKey;
+      renderShowsStep(container);
+    };
+  });
+
+  bindInputs(container);
+  navButtons(container);
+}
+
+/* ======================================================================
+   Step: כתובת ותקשורת
+   ====================================================================== */
+function renderAddressStep(container){
+  const a = state.address, e = state.emergency;
+  container.innerHTML = `
+    <h2>כתובת ותקשורת</h2>
+    <div class="row2">
+      <div class="field"><label>רחוב ומספר <span class="req">*</span></label>
+        <input type="text" data-bind="address.street" value="${a.street}"></div>
+      <div class="field"><label>מיקוד</label>
+        <input type="text" data-bind="address.zip" value="${a.zip}"></div>
+    </div>
+    <div class="field"><label>עיר <span class="req">*</span></label>
+      <input type="text" data-bind="address.city" value="${a.city}"></div>
+
+    <div class="row2">
+      <div class="field"><label>נייד <span class="req">*</span></label>
+        <input type="tel" data-bind="address.mobile" value="${a.mobile}"></div>
+      <div class="field"><label>טלפון בית</label>
+        <input type="tel" data-bind="address.home" value="${a.home}"></div>
+    </div>
+    <div class="field"><label>דוא"ל <span class="req">*</span></label>
+      <input type="email" data-bind="address.email" value="${a.email}"></div>
+
+    <div class="section-title">איש קשר למקרה חירום</div>
+    <div class="field"><label>שם <span class="req">*</span></label>
+      <input type="text" data-bind="emergency.name" value="${e.name}"></div>
+    <div class="row2">
+      <div class="field"><label>טלפון 1 <span class="req">*</span></label>
+        <input type="tel" data-bind="emergency.phone1" value="${e.phone1}"></div>
+      <div class="field"><label>טלפון 2</label>
+        <input type="tel" data-bind="emergency.phone2" value="${e.phone2}"></div>
+    </div>
+
+    <div class="field"><label>כיצד נודע לכם על הטיול?</label>
+      <select data-bind="heardAboutUs">
+        <option value="">בחר/י</option>
+        <option ${state.heardAboutUs==="חבר/ה"?"selected":""}>חבר/ה</option>
+        <option ${state.heardAboutUs==="אתר אינטרנט"?"selected":""}>אתר אינטרנט</option>
+        <option ${state.heardAboutUs==="פייסבוק/אינסטגרם"?"selected":""}>פייסבוק/אינסטגרם</option>
+        <option ${state.heardAboutUs==="טיול קודם"?"selected":""}>טיול קודם</option>
+        <option ${state.heardAboutUs==="אחר"?"selected":""}>אחר</option>
+      </select></div>
+  `;
+  bindInputs(container);
+  navButtons(container);
+}
+function validateAddressStep(){
+  const a=state.address, e=state.emergency;
+  if(!a.street||!a.city||!a.mobile||!a.email||!e.name||!e.phone1){
+    alert("נא למלא את כל שדות החובה");
+    return false;
+  }
+  return true;
+}
+
+/* ======================================================================
+   Step: הסכמות ואישורים
+   ====================================================================== */
+const CONSENT_SECTIONS = [
+  {
+    title: "דרכון ומסמכים",
+    items: [
+      {
+        id:"passportValidity",
+        text:"אני מתחייב/ת לוודא שדרכוני בתוקף לפחות חצי שנה לאחר יום החזרה ושיש בו לפחות 3 עמודים ריקים לחותמות. אני מתחייב/ת שיש ברשותי את כל המסמכים הנדרשים לפני היציאה ומקבל/ת על עצמי אחריות מלאה לכך."
+      }
+    ]
+  },
+  {
+    title: "בריאות וכושר גופני",
+    items: [
+      {
+        id:"physicalReq",
+        text:"ידוע לי שהטיול אינו מתאים למוגבלים בהליכה, וכי אני עומד/ת בדרישות הגופניות הנדרשות."
+      },
+      {
+        id:"healthResponsibility",
+        text:"אני מבין/ה שאם תתעוררנה מגבלות בריאותיות במהלך הטיול, אמתין לקבוצה או אחזור בכוחות עצמי ועל חשבוני לאוטובוס או למלון."
+      }
+    ]
+  },
+  {
+    title: "ביטוח נסיעות",
+    items: [
+      {
+        id:"travelInsurance",
+        html:"אני מבין/ה שחובה להוציא פוליסת ביטוח נסיעות לחו\"ל <u>במקביל להרשמה</u>, הכוללת אפשרות לביטול רישום, בשל דמי הביטול הגבוהים. אבדוק גם את האפשרות של ביטוח ביטול מכל סיבה."
+      },
+      {
+        id:"insuranceCoverage",
+        html:"ידוע לי שיש לוודא שהפוליסה תכסה גם דמי ביטול במקרה של מחלת המבוטח או קרוב משפחה מדרגה ראשונה, ומומלץ להוסיף כיסוי מגפה."
+      },
+      {
+        id:"insuranceOfferAgency",
+        showWhen: () => state.insuranceOptIn,
+        html:"ידוע לי שסוכנות הביטוח \"זיו פתרונות חכמים בביטוח\" יפנו אליי עם הצעה לפוליסת ביטוח (מקיפה ואשר תקפה החל מ- 120 יום מראש, לכל גיל וכל מצב רפואי)."
+      },
+      {
+        id:"insuranceOfferParallel",
+        showWhen: () => !state.insuranceOptIn,
+        html:"ביטוח נסיעות לחו\"ל הכרחי כדי שיכסה אתכם במקרה רפואי לפני היציאה לחו\"ל או במהלך שהותכם בחו\"ל. אני מתחייב/ת להפיק במקביל להרשמה ביטוח נסיעות לחו\"ל."
+      }
+    ]
+  },
+  {
+    title: "רישום ותשלום",
+    items: [
+      {
+        id:"placeConfirmation",
+        text:"ידוע לי שהבטחת המקום תעשה אך ורק על סמך שלושה תנאים במצטבר: טופס רישום חתום שהתקבל בקשרי תרבות תבל, תשלום ראשון בפועל (מקדמה בכרטיס אשראי בסך 1200 דמי רישום שלא יוחזרו בשום מקרה והינם חלק מהתשלום הסופי), ועל פי סדר קבלת הטפסים.",
+        renderWithCurrency: true
+      },
+      {
+        id:"registrationEmail",
+        text:"כאשר טופס הרישום שלי יקלט בחברה, אקבל אוטומטית מייל עם אישור רישום. אם לא קיבלתי אישור רישום במייל, עלי לפנות למשרד."
+      }
+    ]
+  },
+  {
+    title: "תנאי עסקה וביטול",
+    items: [
+      {
+        id:"dealTerms",
+        text:"אני מאשר/ת את פרטי העסקה, תנאי התשלום ותנאי הביטול כמפורט בתכנית הטיול."
+      },
+      {
+        id:"noCancellationClaims",
+        html:"ידוע לי שלא יתקבלו השגות על דמי ביטול <b><u>מכל סיבה שהיא</u></b>, כולל דרכון שאינו בתוקף, אי-רכישת ביטוח נסיעות או אי קבלת אשרת כניסה."
+      },
+      {
+        id:"tripConfirmationWindow",
+        html:"ידוע לי שהחברה תיידע אותי אם הטיול מאושר ליציאה <u>עד</u> 10 ימים לפני מועד היציאה (ובמרבית המקרים הרבה קודם)."
+      },
+      {
+        id:"flightChanges",
+        html:"שינוי במועדי הטיסות - במידה וטיסת ההלוך או החזור, תוקדם או תדחה ממועד הטיסה המתוכנן ע\"י חברת התעופה ו/או לפי הנחיות הרשויות המוסמכות, קשרי תרבות חבל לא תישא בעלויות הנוספות ועלויות אלה יחולו במלואן על הלקוח (שבמקרה יכול לפנות לשיפוי מחברת הביטוח), כולל תשלום למדריך על ימי הדרכה נוספים, עלויות לינה, עלות תחבורה נוספת, כניסות לאתרים, הדרכה מקומית, תשר, רכישת כרטיס טיסה חדש וכל הוצאה נוספת ככל שתהיה. קשרי תרבות חבל תעשה כל מאמץ למזער את הנזק שיגרם על המטיילים מבלי לפגוע באיכות הטיול."
+      }
+    ]
+  },
+  {
+    title: "מגבלות שירות ספקים",
+    items: [
+      {
+        id:"orderOnly",
+        text:"ידוע לי שטופס זה הוא הזמנה בלבד ואינו מהווה אישור לגבי מקומות בטיול, בטיסות או בבתי המלון."
+      },
+      {
+        id:"supplierLimits",
+        text:"ידוע לי שלחברה ולסוכני הנסיעות אין שליטה על שירותי ספקים חיצוניים, כגון חדרים ספציפיים במלונות, סוגי ארוחות, מקומות באולמות, ומקומות ישיבה במטוס, גם אם הוזמנו לבקשתנו."
+      }
+    ]
+  },
+  {
+    title: "תקנון וחתימה",
+    items: [
+      {
+        id:"programTerms",
+        html:"__PROGRAM_TERMS__"
+      },
+      {
+        id:"finalAgreement",
+        html:"אני מאשר/ת שחתימתי על טופס ההרשמה מחייבת ומהווה אישור על קריאה והבנה מלאה של תכנית הטיול, לרבות סעיף דמי הביטול."
+      }
+    ]
+  }
+];
+
+function visibleConsentSections(){
+  return CONSENT_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => !item.showWhen || item.showWhen())
+  })).filter((section) => section.items.length > 0);
+}
+
+function visibleConsentItems(){
+  return visibleConsentSections().flatMap((section) => section.items);
+}
+
+const CONSENT_ITEMS = CONSENT_SECTIONS.flatMap((section) => section.items);
+
+function consentItemHtml(item){
+  if(item.id === "programTerms"){
+    const brochureLink = tripBrochureUrl()
+      ? `<a href="${tripBrochureUrl()}" target="_blank" rel="noopener noreferrer">לתכנית הטיול</a>`
+      : "לתכנית הטיול";
+
+    return `ידוע לי שתנאי הרישום והביטול כפופים ${brochureLink} ולתקנון קשרי תרבות תבל, הזמין במשרדי החברה, בפקס, בדוא"ל או באתר: <a href="http://www.k-tarbut.co.il" target="_blank" rel="noopener noreferrer">www.k-tarbut.co.il</a>`;
+  }
+
+  let text = item.html || item.text;
+  
+  // Replace currency placeholder with symbol
+  if(item.renderWithCurrency && trip){
+    text = text.replace("דמי רישום", `${tripCurrency()} דמי רישום`);
+  }
+  
+  return text;
+}
+
+function renderConsentsStep(container){
+  const sectionsHtml = visibleConsentSections().map((section)=>{
+    const itemsHtml = section.items.map((item)=>`
+      <div class="checkbox-row">
+        <input type="checkbox" id="c_${item.id}" ${state.consents[item.id]?"checked":""}>
+        <label for="c_${item.id}">${consentItemHtml(item)} <span class="req">*</span></label>
+      </div>`).join("");
+
+    const insuranceFollowUp = section.title === "ביטוח נסיעות" && !state.insuranceOptIn && state.consents.insuranceOfferParallel && state.insuranceOfferParallelConfirmed ? `
+      <div class="switch-row" style="margin-top:10px;">
+        <span class="lbl">פנו אלי עם הצעה לביטוח</span>
+        <label class="switch"><input type="checkbox" id="insuranceOfferToggle" ${state.insuranceOfferFollowUp?"checked":""}><span class="slider"></span></label>
+      </div>
+    ` : "";
+
+    return `
+      <div class="section-title">${section.title}</div>
+      ${itemsHtml}
+      ${insuranceFollowUp}
+    `;
+  }).join("");
+
+  container.innerHTML = `
+    <h2>הסכמות ואישורים</h2>
+    <div class="info-box">
+      כדי שנוכל לדאוג לכם מא' ועד ת', ולהבטיח את מקומכם בטיול - יש כמה דברים חשובים שכדאי לסדר מראש. כתבנו בהמשך הכל בשפה ברורה ומסודרת.<br><br>
+      עברנו על כל הפרטים הטכניים והפכנו אותם לשאלות פשוטות וברורות. כל סעיף קטן שתסמנו עכשיו - חוסך שאלות, טלפונים ואי-נעימויות אחר כך.<br><br>
+      <b>מה תמצאו כאן?</b><br><br>
+      קודם נוודא שהדרכון שלכם מוכן ושרמת הקושי של טיול מאורגן בחו\"ל מתאימה לכם. אחר כך נוודא שאתם מבטחים את עצמכם בפוליסת ביטוח נסיעות לחו\"ל כדי שתגן עליכם מהיום ועד החזרה מהטיול, ולבסוף, נסכם את תנאי הרישום כדי שהכל יהיה שקוף וברור.
+    </div>
+    ${sectionsHtml}
+  `;
+  CONSENT_ITEMS.forEach(item=>{
+    const checkbox = container.querySelector(`#c_${item.id}`);
+    if(checkbox){
+      checkbox.onchange = (e)=>{
+        state.consents[item.id] = e.target.checked;
+        if(item.id === "insuranceOfferParallel"){
+          state.insuranceOfferParallelConfirmed = e.target.checked;
+          if(!e.target.checked) state.insuranceOfferFollowUp = false;
+          renderConsentsStep(container);
+        }
+      };
+    }
+  });
+  const insuranceOfferToggle = container.querySelector("#insuranceOfferToggle");
+  if(insuranceOfferToggle){
+    insuranceOfferToggle.onchange = (e)=>{
+      state.insuranceOfferFollowUp = e.target.checked;
+    };
+  }
+  navButtons(container);
+}
+function validateConsentsStep(){
+  const allChecked = visibleConsentItems().every(i=>state.consents[i.id]);
+  if(!allChecked){
+    alert("נא לאשר את כל ההצהרות לפני המשך");
+    return false;
+  }
+  return true;
+}
+
+/* ======================================================================
+   Step: תשלום וחתימה
+   ====================================================================== */
+function renderPaymentStep(container){
+  const p = state.payment;
+  const summary = buildPaymentSummary();
+  const moneyRows = summary.components.map((c)=>`
+      <div class="money-row">
+        <div>${c.label}${c.meta ? ` <span class="money-note">(${c.meta})</span>` : ""}</div>
+        <div class="num">${c.quantity}</div>
+        <div class="num">${formatTripAmount(c.unitAmount)}</div>
+        <div class="num">${formatTripAmount(c.amount)}</div>
+      </div>
+    `).join("");
+
+  const notesHtml = summary.notes.length
+    ? `<div class="money-note">${summary.notes.join(" ")}</div>`
+    : "";
+
+  // Early booking discount info
+  const earlyBookingEndDate = trip?.namedFields?.["תאריך סיום הרשמה מוקדמת"] || "";
+  const earlyBookingHtml = earlyBookingEndDate ? `
+    <div class="info-box" style="background:#F5F5F5; border-color:#D0D0D0; color:#424242;">
+      <strong>הנחת רישום מוקדם</strong><br>
+      הרשמה מוקדמת עד לתאריך ${formatDateEuropean(earlyBookingEndDate)} - הנחה בסך 75 ${tripCurrency()}
+    </div>
+  ` : "";
+
+  // Frequent traveler info - with proper text
+  const frequentTravelerDate = trip?.namedFields?.["תאריך הטבת מטייל מתמיד"] || "01.01.23";
+  const frequentTravelerFirstDiscount = trip?.namedFields?.["הנחה ראשונה מטייל מתמיד"] || "25";
+  const frequentTravelerSecondDiscount = trip?.namedFields?.["הנחה נוספת מטייל מתמיד"] || "10";
+  
+  const frequentTravelerHtml = `
+    <div class="info-box">
+      <strong>הטבת מטייל מתמיד</strong><br>
+      מי שנסע איתנו לטיול אחד לפחות אחרי ${formatDateEuropean(frequentTravelerDate)}, למטיילים מתמידים בחו"ל עם "קשרי תרבות תבל"<br>
+      הנחה בסך ${frequentTravelerFirstDiscount} ${tripCurrency()} עבור הטיול הראשון אחרי תאריך זה,<br>
+      ${frequentTravelerSecondDiscount} ${tripCurrency()} לכל טיול נוסף מאז.
+    </div>
+  `;
+
+  // Payment terms info
+  const paymentTermsHtml = `
+    <div class="info-box" style="background:#FFF9E6; border-color:#FFE680; color:#7A6D00;">
+      <strong>תנאי התשלום</strong><br><br>
+      <strong>מקדמה מיידית</strong> שהיא מהווה דמי הרשמה וטיפול בסך 1200 ${tripCurrency()},
+      משולמת היום בכרטיס אשראי (בלבד).
+      לאחר שליחת הטופס, תועברו לדף סליקה עבור המקדמה, ולאחר התשלום תקבלו אישור רישום במייל.<br><br>
+      <strong>השלמת תשלום</strong> לפי מסלולי תשלום לבחירתך:
+      לאחר הבטחת היציאה, תקבלו מייל עם בקשה להשלמת התשלום. ניתן לשלם בכרטיס אשראי, במזומן (בכפוף להגבלות חוק צמצום המזומן), או בהעברה בנקאית.
+    </div>
+  `;
+
+  container.innerHTML = `
+    <h2>סיכום לתשלום וחתימה</h2>
+
+    ${earlyBookingHtml}
+
+    <div class="money-summary">
+      <div class="money-row head">
+        <div>רכיב</div>
+        <div class="num">כמות</div>
+        <div class="num">ליחידה</div>
+        <div class="num">סכום</div>
+      </div>
+      ${moneyRows || `<div class="money-row"><div>לא נמצאו רכיבי חיוב מחושבים</div><div class="num">-</div><div class="num">-</div><div class="num">-</div></div>`}
+      <div class="money-row money-total">
+        <div>סה"כ לתשלום</div>
+        <div></div>
+        <div></div>
+        <div class="num">${formatTripAmount(summary.estimatedTotal)}</div>
+      </div>
+    </div>
+    ${notesHtml}
+
+    ${frequentTravelerHtml}
+    <div class="switch-row">
+      <span class="lbl">אני מטייל/ת מתמיד/ה (טיול נוסף איתנו לאחר 01.01.23)</span>
+      <label class="switch"><input type="checkbox" id="freqTraveler" ${p.frequentTraveler?"checked":""}><span class="slider"></span></label>
+    </div>
+    <div class="field" id="freqTripsWrap" style="${p.frequentTraveler?"":"display:none"}">
+      <label>נא לציין את הטיולים בהם השתתפת</label>
+      <input type="text" data-bind="payment.frequentTravelerTrips" value="${p.frequentTravelerTrips}">
+    </div>
+
+    ${paymentTermsHtml}
+
+    <div class="field"><label>אמצעי תשלום <span class="req">*</span></label>
+      <select data-bind="payment.method">
+        <option value="">בחר/י</option>
+        <option ${p.method==="כרטיס אשראי"?"selected":""}>כרטיס אשראי</option>
+        <option ${p.method==="העברה בנקאית"?"selected":""}>העברה בנקאית</option>
+        <option ${p.method==="מזומן"?"selected":""}>מזומן</option>
+      </select></div>
+
+    <div class="field"><label>תאריך</label>
+      <input type="date" data-bind="payment.date" value="${p.date}"></div>
+
+    <div class="field">
+      <label>חתימה <span class="req">*</span></label>
+      <canvas id="sigPad" class="sig-pad"></canvas>
+      <button type="button" class="sig-clear" id="sigClear">נקה חתימה</button>
+    </div>
+  `;
+  bindInputs(container);
+  container.querySelector("#freqTraveler").onchange = (e)=>{
+    p.frequentTraveler = e.target.checked;
+    document.getElementById("freqTripsWrap").style.display = e.target.checked? "":"none";
+  };
+  setupSignaturePad(container.querySelector("#sigPad"));
+  container.querySelector("#sigClear").onclick = ()=>{
+    clearSignature();
+    p.signatureData = "";
+  };
+  navButtons(container);
+}
+function validatePaymentStep(){
+  if(!state.payment.method){ alert("נא לבחור אמצעי תשלום"); return false; }
+  if(!state.payment.signatureData){ alert("נא לחתום לפני שליחת ההרשמה"); return false; }
+  return true;
+}
+
+let sigCtx, sigDrawing=false;
+function setupSignaturePad(canvas){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  sigCtx = canvas.getContext("2d");
+  sigCtx.strokeStyle = "#2C2A28";
+  sigCtx.lineWidth = 2;
+  sigCtx.lineCap = "round";
+
+  function pos(e){
+    const rect = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return {x:p.clientX-rect.left, y:p.clientY-rect.top};
+  }
+  function start(e){ sigDrawing=true; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x,p.y); }
+  function move(e){
+    if(!sigDrawing) return;
+    e.preventDefault();
+    const p=pos(e); sigCtx.lineTo(p.x,p.y); sigCtx.stroke();
+    state.payment.signatureData = canvas.toDataURL();
+  }
+  function end(){ sigDrawing=false; }
+
+  canvas.addEventListener("mousedown",start);
+  canvas.addEventListener("mousemove",move);
+  canvas.addEventListener("mouseup",end);
+  canvas.addEventListener("touchstart",start);
+  canvas.addEventListener("touchmove",move);
+  canvas.addEventListener("touchend",end);
+}
+function clearSignature(){
+  if(sigCtx) sigCtx.clearRect(0,0,sigCtx.canvas.width,sigCtx.canvas.height);
+}
+
+/* ======================================================================
+   Generic input binder (data-bind="a.b.c")
+   ====================================================================== */
+function bindInputs(container){
+  container.querySelectorAll("[data-bind]").forEach(el=>{
+    const path = el.dataset.bind.split(".");
+    const evt = (el.tagName==="SELECT" || el.type==="checkbox") ? "change" : "input";
+    el.addEventListener(evt, ()=>{
+      let obj = state;
+      for(let i=0;i<path.length-1;i++) obj = obj[path[i]];
+      const key = path[path.length-1];
+      obj[key] = el.type==="checkbox" ? el.checked : el.value;
+    });
+  });
+}
+
+/* ======================================================================
+   Submit
+   ====================================================================== */
+async function submitForm(){
+  if(!steps[currentStepIndex].validate()) return;
+
+  const payload = {
+    trip_id: trip.id,
+    trip_name: trip.fields[F.name],
+    trip_type: tripTypeName(),
+    submitted_at: new Date().toISOString(),
+    ...state
+  };
+
+  try{
+    const res = await fetch(`${CONFIG.API_BASE}/api/submissions`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error("submit failed");
+    const result = await res.json();
+    renderDone(result.mode === "dry-run");
+  }catch(e){
+    console.error(e);
+    alert("אירעה שגיאה בשליחת הטופס. נסו שוב, או פנו אלינו.");
+  }
+}
+
+function renderDone(noWebhook){
+  document.getElementById("app").innerHTML = `
+    <div class="card done-wrap">
+      <div class="check">✓</div>
+      <h2>✨ ההרשמה שלכם התקבלה בהצלחה!</h2>
+      <p class="sub">
+        תודה שבחרתם להצטרף אלינו — כל טיול תרבות חדש מתחיל ברגע כזה.<br><br>
+        
+        <strong>מה קורה עכשיו?</strong><br>
+        ✓ ההרשמה שלכם נקלטה אצלנו<br>
+        ✓ הצוות שלנו יבחן את הפרטים ויאשר את מקומכם<br>
+        ✓ כשהטיול יצא לדרך — נעדכן אתכם עם כל הפרטים<br><br>
+        
+        <strong>מה הצעד הבא?</strong><br>
+        תשמעו מאתנו בקרוב עם כל הפרטים הסופיים — טיסות, לינות, וההיכרות המלאה עם מסלול הטיול.<br><br>
+        
+        <strong>יש שאלה?</strong> אנחנו תמיד כאן. פשוט צרו איתנו קשר.<br><br>
+        
+        🌍 מחכים לצאת איתכם לדרך!
+      </p>
+      ${noWebhook ? `<div class="config-banner" style="text-align:right;margin-top:18px;">
+        ⚠️ לתשומת לבך: עדיין לא הוגדרה כתובת Webhook בשרת, כך שהשליחה בוצעה במצב dry-run.
+      </div>` : ""}
+    </div>`;
+}
+
+/* ======================================================================
+   Boot
+   ====================================================================== */
+async function boot(){
+  initDemoModeFromUrl();
+  applyDemoMode();
+  await loadRuntimeConfig();
+  await loadTrip();
+}
+
+boot();
+</script>
+</body>
+</html>
