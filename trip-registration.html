@@ -747,6 +747,67 @@
   .wl-submit:disabled{opacity:.6;transform:none;cursor:default;}
   .wl-pass-footer{height:6px;background:linear-gradient(90deg,#73122B 0%,#B99552 50%,#48826E 100%);}
 
+  /* === MAIN FORM BOARDING PASS HEADER === */
+  .mf-bp-header{
+    background:#F8F4EE;border-radius:var(--radius);overflow:hidden;
+    margin-bottom:10px;border:1px solid #e4d8ce;
+    box-shadow:0 2px 10px rgba(70,42,30,.07);
+  }
+  .mf-bp-topbar{
+    height:5px;
+    background:linear-gradient(90deg,#7A1515 0%,#B99552 50%,#2d5e3c 100%);
+  }
+  .mf-bp-inner{padding:10px 18px 10px;}
+  .mf-bp-top{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .mf-bp-logo{width:70px;height:auto;display:block;mix-blend-mode:darken;}
+  .mf-bp-step-badge{
+    background:rgba(122,21,21,.08);border:1px solid rgba(122,21,21,.25);
+    color:#7A1515;font-size:11px;font-weight:700;letter-spacing:1px;
+    padding:3px 10px;border-radius:999px;
+  }
+  .mf-bp-trip-label{
+    font-size:12px;letter-spacing:1px;color:#4a3a2e;text-align:center;
+    font-weight:600;margin:0 0 2px;
+  }
+  .mf-bp-trip-name{
+    font-size:24px;font-weight:700;color:#7A1515;
+    margin:0 0 8px;line-height:1.2;text-align:center;
+  }
+  .mf-bp-journey-header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:5px;
+  }
+  .mf-bp-date-side{font-size:12px;font-weight:600;color:#4a3a2e;line-height:1.5;}
+  .mf-bp-track-outer{position:relative;margin-bottom:2px;}
+  .mf-bp-track-line{
+    position:absolute;top:50%;left:0;right:0;height:2px;
+    background:rgba(122,21,21,.12);transform:translateY(-50%);z-index:1;
+  }
+  .mf-bp-track-fill{
+    position:absolute;top:0;right:0;height:100%;
+    background:#7A1515;border-radius:2px;transition:width .4s ease;
+  }
+  .mf-bp-dots-row{
+    display:flex;width:100%;justify-content:space-between;
+    align-items:center;position:relative;z-index:2;padding:4px 0;
+  }
+  .mf-bp-dot{
+    width:10px;height:10px;border-radius:50%;flex-shrink:0;
+    background:#e4d8ce;border:2px solid rgba(122,21,21,.2);transition:all .3s;
+  }
+  .mf-bp-dot.done{background:#7A1515;border-color:#7A1515;}
+  .mf-bp-dot.plane{
+    background:none;border:none;font-size:17px;line-height:1;
+    width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+    transform:scaleX(-1);
+  }
+  .mf-bp-step-label{
+    font-size:12px;color:#4a3a2e;margin-top:4px;text-align:right;
+  }
+
   /* airplane floating in trip header */
   .header-plane{
     position:absolute;
@@ -1574,9 +1635,11 @@ function renderApp(){
   const app = document.getElementById("app");
   const step = steps[currentStepIndex];
 
-  const segs = steps.map((s,i)=>{
-    const cls = i < currentStepIndex ? "done" : (i===currentStepIndex ? "active" : "");
-    return `<div class="progress-seg ${cls}"></div>`;
+  const trackFillPct = steps.length > 1 ? (currentStepIndex / (steps.length - 1)) * 100 : 0;
+  const dotsHtml = steps.map((_,i)=>{
+    if(i === currentStepIndex) return `<div class="mf-bp-dot plane">✈</div>`;
+    const cls = i < currentStepIndex ? "done" : "";
+    return `<div class="mf-bp-dot ${cls}"></div>`;
   }).join("");
 
   app.innerHTML = `
@@ -1590,25 +1653,23 @@ function renderApp(){
       </div>
       ${usingDefaultTripId ? `<div class="trip-warning">⚠️ לא צוין מזהה טיול בקישור (?id=) — מוצג טיול דמו לבדיקה (${CONFIG.DEFAULT_TRIP_ID}).</div>` : ""}
     </div>
-    <div class="trip-header">
-      <span class="header-plane">✈</span>
-      <div class="trip-header-main">
-        <div class="trip-heading-row">
-          <div class="trip-heading-copy">
-            <p class="trip-eyebrow">הרשמה לטיול</p>
-            <h1 class="trip-name">${trip.fields[F.name] || ""}</h1>
-          </div>
-          <div class="trip-logo-wrap">
-            <img class="trip-logo-embed" src="logo.jpg" alt="לוגו קשרי תרבות תבל" loading="lazy" decoding="async">
-          </div>
+    <div class="mf-bp-header">
+      <div class="mf-bp-topbar"></div>
+      <div class="mf-bp-inner">
+        <div class="mf-bp-top">
+          <img src="logo.jpg" class="mf-bp-logo" alt="לוגו תבל">
+          <span class="mf-bp-step-badge">שלב ${currentStepIndex+1} / ${steps.length}</span>
         </div>
-        <div class="trip-meta">
-          ${trip.fields[F.departDate] ? `<span>🛫 יציאה: ${trip.fields[F.departDate]}</span>`:""}
-          ${trip.fields[F.returnDate] ? `<span>🛬 חזרה: ${trip.fields[F.returnDate]}</span>`:""}
-          ${tripTypeName() ? `<span>🏷️ ${tripTypeName()}</span>`:""}
+        <p class="mf-bp-trip-label">הרשמה ל${trip.fields[F.tripType] ? trip.fields[F.tripType] + ":" : "טיול:"}</p>
+        <h1 class="mf-bp-trip-name">${trip.fields[F.name] || ""}</h1>
+        <div class="mf-bp-journey-header">
+          ${trip.fields[F.departDate] ? `<div class="mf-bp-date-side">${formatDateEuropean(trip.fields[F.departDate])}</div>` : "<div></div>"}
+          ${trip.fields[F.returnDate] ? `<div class="mf-bp-date-side" style="text-align:left">${formatDateEuropean(trip.fields[F.returnDate])}</div>` : "<div></div>"}
         </div>
-        <div class="progress-row">${segs}</div>
-        <div class="step-label">שלב <b>${currentStepIndex+1}</b> מתוך ${steps.length} — ${step.title}</div>
+        <div class="mf-bp-track-outer">
+          <div class="mf-bp-track-line"><div class="mf-bp-track-fill" style="width:${trackFillPct}%"></div></div>
+          <div class="mf-bp-dots-row">${dotsHtml}</div>
+        </div>
       </div>
     </div>
     <div class="card" id="stepCard"></div>
