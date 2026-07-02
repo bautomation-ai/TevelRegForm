@@ -2268,10 +2268,7 @@ function renderShowsStep(container){
     const extras    = catExtraFields(cat);
     const imgUrl    = showImageUrl(cat);
 
-    const chips = [
-      ...(capacity ? [{key:"מקומות זמינים", value:capacity}] : []),
-      ...extras
-    ];
+    const chips = [...extras];
 
     return `
       <div class="room-option show-ticket ${checked?"selected":""}" data-show-id="${cat.id}">
