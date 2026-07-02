@@ -2,21 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "logo.jpg",
+      "src": "newlogo.png",
       "use": "@vercel/static"
     },
     {
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["trip-registration.html"]
+        "includeFiles": ["trip-registration.html", "thank-you.html"]
       }
     }
   ],
   "routes": [
     {
-      "src": "/logo.jpg",
-      "dest": "/logo.jpg"
+      "src": "/newlogo.png",
+      "dest": "/newlogo.png"
     },
     {
       "src": "/(.*)",

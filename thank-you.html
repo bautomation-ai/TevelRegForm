@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ההרשמה התקבלה | תבל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#73122B;
+    --maroon-dark:#54091F;
+    --sage:#DCE8E3;
+    --sage-light:#E4EEEA;
+    --cream:#F8F4EE;
+    --ink:#2C2A28;
+    --muted:#6b6360;
+    --card:#FFFFFF;
+    --border:#DCD3CC;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Assistant',sans-serif;
+    background:
+      radial-gradient(1200px 500px at 100% -10%, rgba(115,18,43,.08), transparent 62%),
+      radial-gradient(900px 420px at 0% 0%, rgba(72,130,110,.10), transparent 58%),
+      linear-gradient(180deg, #edf3f0 0%, var(--cream) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    direction:rtl;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 18px;
+  }
+  .app{
+    max-width:600px;
+    width:100%;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    border:1px solid #e4d8ce;
+    padding:48px 36px;
+    box-shadow:0 2px 4px rgba(0,0,0,.03), 0 14px 34px rgba(60,30,20,.08);
+  }
+  .done-wrap{text-align:center;animation:fadeSlideUp .6s ease both;}
+  .check{
+    width:80px;height:80px;border-radius:50%;
+    background:linear-gradient(135deg,var(--sage-light),#c5e0d6);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 24px;
+    box-shadow:0 6px 24px rgba(72,130,110,.22);
+    animation:checkPop .55s cubic-bezier(.34,1.56,.64,1) .15s both;
+  }
+  .check-svg-path{
+    stroke-dasharray:42;
+    stroke-dashoffset:42;
+    animation:drawCheck .5s ease .6s forwards;
+  }
+  @keyframes checkPop{
+    0%{transform:scale(0) rotate(-20deg);opacity:0;}
+    100%{transform:scale(1) rotate(0deg);opacity:1;}
+  }
+  @keyframes drawCheck{to{stroke-dashoffset:0;}}
+  @keyframes fadeSlideUp{
+    0%{opacity:0;transform:translateY(22px);}
+    100%{opacity:1;transform:translateY(0);}
+  }
+  h1{
+    font-family:'Assistant',sans-serif;
+    font-size:28px;
+    margin:0 0 16px;
+    color:var(--maroon-dark);
+    line-height:1.2;
+  }
+  p{
+    font-size:15px;
+    color:var(--muted);
+    line-height:1.8;
+    margin:0 0 8px;
+  }
+  .done-plane{
+    display:inline-block;
+    font-size:34px;
+    margin-top:20px;
+    animation:takeOff 2.2s ease 1.3s both;
+  }
+  @keyframes takeOff{
+    0%{transform:translateX(0) translateY(0) rotate(0deg);opacity:1;}
+    60%{opacity:1;}
+    100%{transform:translateX(120px) translateY(-60px) rotate(-25deg);opacity:0;}
+  }
+  .logo-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:28px;
+  }
+  .logo-wrap img{
+    width:100px;
+    height:auto;
+    mix-blend-mode:darken;
+    opacity:.9;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+    <div class="done-wrap">
+      <div class="logo-wrap">
+        <img src="/logo.jpg" alt="לוגו תבל">
+      </div>
+      <div class="check">
+        <svg viewBox="0 0 40 40" fill="none" stroke="var(--maroon)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="44" height="44">
+          <polyline points="8,21 16,30 32,12" class="check-svg-path"/>
+        </svg>
+      </div>
+      <h1>✨ ההרשמה שלכם התקבלה בהצלחה!</h1>
+      <p>
+        תודה שבחרתם להצטרף אלינו — כל טיול תרבות חדש מתחיל ברגע כזה.
+      </p>
+      <p>
+        <strong>מה קורה עכשיו?</strong><br>
+        ✓ ההרשמה שלכם נקלטה אצלנו<br>
+        ✓ הצוות שלנו יבחן את הפרטים ויאשר את מקומכם<br>
+        ✓ כשהטיול יצא לדרך — נעדכן אתכם עם כל הפרטים
+      </p>
+      <p>
+        <strong>מה הצעד הבא?</strong><br>
+        תשמעו מאתנו בקרוב עם כל הפרטים הסופיים — טיסות, לינות, וההיכרות המלאה עם מסלול הטיול.
+      </p>
+      <p><strong>יש שאלה?</strong> אנחנו תמיד כאן. פשוט צרו איתנו קשר.</p>
+      <span class="done-plane">✈</span>
+    </div>
+  </div>
+</div>
+<script>
+function launchConfetti(){
+  const canvas = document.createElement("canvas");
+  canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+  const colors = ["#73122B","#B99552","#DCE8E3","#54091F","#48826E","#E4EEEA","#f5c842","#fff"];
+  const pieces = Array.from({length:100}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: 5 + Math.random() * 7,
+    h: 7 + Math.random() * 9,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random() - 0.5) * 2.5,
+    vy: 2.5 + Math.random() * 3.5,
+    vr: (Math.random() - 0.5) * 0.18,
+  }));
+  let frame = 0;
+  function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - frame / 140);
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame < 160) requestAnimationFrame(draw);
+    else canvas.remove();
+  }
+  requestAnimationFrame(draw);
+}
+setTimeout(launchConfetti, 400);
+</script>
+</body>
+</html>

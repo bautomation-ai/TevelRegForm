@@ -16,6 +16,8 @@ const CRUISE_TRIP_LINK_FIELD_ID = process.env.AIRTABLE_CRUISE_TRIP_LINK_FIELD_ID
 const DEFAULT_TRIP_ID = process.env.DEFAULT_TRIP_ID || "";
 const SUBMIT_WEBHOOK_URL = process.env.SUBMIT_WEBHOOK_URL || "";
 const WAITLIST_WEBHOOK_URL = process.env.WAITLIST_WEBHOOK_URL || "";
+const PAYMENT_URL_1 = process.env.PAYMENT_URL_1 || "";
+const PAYMENT_URL_2 = process.env.PAYMENT_URL_2 || "";
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.static(path.join(__dirname)));
@@ -108,7 +110,9 @@ app.get("/api/config", (req, res) => {
     webhookConfigured: Boolean(SUBMIT_WEBHOOK_URL),
     projectsTable: PROJECTS_TABLE,
     cruiseTable: CRUISE_TABLE,
-    showsTable: SHOWS_TABLE
+    showsTable: SHOWS_TABLE,
+    paymentUrl1: PAYMENT_URL_1,
+    paymentUrl2: PAYMENT_URL_2,
   });
 });
 
@@ -264,6 +268,10 @@ app.post("/api/waitlist", async (req, res) => {
 app.get("/health", (req, res) => {
   const hasAirtable = Boolean(AIRTABLE_TOKEN && AIRTABLE_BASE_ID);
   res.json({ ok: true, hasAirtable });
+});
+
+app.get("/thank-you", (req, res) => {
+  res.sendFile(path.join(__dirname, "thank-you.html"));
 });
 
 app.get("/", (req, res) => {

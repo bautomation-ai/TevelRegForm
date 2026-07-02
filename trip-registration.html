@@ -407,6 +407,57 @@
   .room-detail-row .k{color:var(--muted);} 
   .room-selected-note{font-size:12px;color:var(--maroon);font-weight:600;margin-top:6px;}
 
+  .deck-plan-wrap{
+    margin-bottom:18px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    background:#f9f5f1;
+  }
+  .deck-plan-label{
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--maroon);
+    padding:8px 12px 6px;
+    border-bottom:1px solid var(--border);
+    letter-spacing:.3px;
+  }
+  .deck-plan-wrap img{
+    width:100%;
+    display:block;
+    cursor:zoom-in;
+  }
+  .deck-plan-wrap img.zoomed{
+    cursor:zoom-out;
+    max-height:none;
+  }
+  .show-ticket-img{
+    width:100%;
+    max-height:180px;
+    overflow:hidden;
+    border-radius:8px;
+    margin-bottom:10px;
+  }
+  .show-ticket-img img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    display:block;
+    border-radius:8px;
+  }
+  .show-group-img{
+    width:72px;
+    height:52px;
+    flex-shrink:0;
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .show-group-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
   .shows-groups{display:grid;gap:14px;}
   .show-group{
     border:1px solid #dccfc5;
@@ -512,6 +563,20 @@
     background:#fff;
   }
   .show-detail-text{max-width:70%;line-height:1.45;}
+  .show-cat-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px;}
+  .show-cat-chip{
+    display:inline-flex;align-items:center;gap:3px;
+    background:#f5ede9;border-radius:6px;
+    padding:3px 9px;font-size:12px;color:#5f3a2e;line-height:1.4;
+  }
+  .show-cat-chip .k{font-weight:700;color:#7c3520;}
+  .show-ticket-action{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;margin-top:10px;padding-top:10px;
+    border-top:1px dashed #e4d5cc;flex-wrap:wrap;
+  }
+  .show-ticket-qty-area{display:flex;align-items:center;gap:8px;font-size:13px;color:#3b3532;}
+  .show-ticket-total-val{font-weight:700;color:#5f1328;min-width:60px;text-align:left;}
   @media (max-width:520px){
     .show-group-title{font-size:18px;}
     .show-group-head{align-items:center;}
@@ -754,34 +819,36 @@
     box-shadow:0 2px 10px rgba(70,42,30,.07);
   }
   .mf-bp-topbar{
-    height:5px;
+    height:4px;
     background:linear-gradient(90deg,#7A1515 0%,#B99552 50%,#2d5e3c 100%);
   }
-  .mf-bp-inner{padding:6px 16px 8px;}
+  .mf-bp-inner{padding:0 14px 6px;}
   .mf-bp-top{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:4px;
+    display:flex;align-items:center;justify-content:flex-start;
+    margin-bottom:0;
   }
-  .mf-bp-logo{width:100px;height:auto;display:block;mix-blend-mode:darken;}
+  .mf-bp-logo{height:110px;width:auto;max-width:300px;display:block;mix-blend-mode:darken;}
   .mf-bp-step-badge{
     background:rgba(122,21,21,.08);border:1px solid rgba(122,21,21,.25);
     color:#7A1515;font-size:11px;font-weight:700;letter-spacing:1px;
-    padding:3px 10px;border-radius:999px;
+    padding:3px 10px;border-radius:999px;flex-shrink:0;white-space:nowrap;
   }
+  .mf-bp-trip-block{text-align:center;padding:0 0 4px;}
   .mf-bp-trip-label{
-    font-size:12px;letter-spacing:1px;color:#4a3a2e;text-align:center;
-    font-weight:600;margin:0 0 2px;
+    font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+    color:#8a6a50;font-weight:600;margin:0 0 3px;
   }
   .mf-bp-trip-name{
-    font-size:30px;font-weight:700;color:#7A1515;
-    margin:0 0 5px;line-height:1.2;text-align:center;
+    font-size:30px;font-weight:800;margin:0;line-height:1.15;
+    background:linear-gradient(135deg,#7A1515 0%,#B99552 60%,#2d5e3c 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   }
   .mf-bp-journey-header{
-    display:flex;justify-content:space-between;align-items:flex-end;
-    margin-bottom:5px;
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:2px;
   }
-  .mf-bp-date-side{font-size:12px;font-weight:600;color:#4a3a2e;line-height:1.5;}
-  .mf-bp-track-outer{position:relative;margin-bottom:2px;}
+  .mf-bp-date-side{font-size:11px;font-weight:600;color:#6a5240;line-height:1;}
+  .mf-bp-track-outer{position:relative;margin-bottom:0;}
   .mf-bp-track-line{
     position:absolute;top:50%;left:0;right:0;height:2px;
     background:rgba(122,21,21,.12);transform:translateY(-50%);z-index:1;
@@ -792,21 +859,19 @@
   }
   .mf-bp-dots-row{
     display:flex;width:100%;justify-content:space-between;
-    align-items:center;position:relative;z-index:2;padding:4px 0;
+    align-items:center;position:relative;z-index:2;padding:3px 0;
   }
   .mf-bp-dot{
-    width:10px;height:10px;border-radius:50%;flex-shrink:0;
+    width:8px;height:8px;border-radius:50%;flex-shrink:0;
     background:#e4d8ce;border:2px solid rgba(122,21,21,.2);transition:all .3s;
   }
   .mf-bp-dot.done{background:#7A1515;border-color:#7A1515;}
   .mf-bp-dot.plane{
-    background:none;border:none;font-size:17px;line-height:1;
-    width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+    background:none;border:none;font-size:15px;line-height:1;
+    width:16px;height:16px;display:flex;align-items:center;justify-content:center;
     transform:scaleX(-1);
   }
-  .mf-bp-step-label{
-    font-size:12px;color:#4a3a2e;margin-top:4px;text-align:right;
-  }
+  .mf-bp-step-label{font-size:12px;color:#4a3a2e;margin-top:4px;text-align:right;}
 
   /* airplane floating in trip header */
   .header-plane{
@@ -846,6 +911,8 @@ const CONFIG = {
   DEFAULT_TRIP_ID: "",
   WEBHOOK_CONFIGURED: false,
   DEMO_PREFILL: true,
+  PAYMENT_URL_1: "",
+  PAYMENT_URL_2: "",
 };
 
 // שמות שדות (Field IDs) בטבלת הפרויקטים
@@ -901,6 +968,7 @@ function buildEmptyState(){
     cruise:{ roomOptionId:"", wantsRoommate:false, roommateName:"", diningTable:"" },
     shows:{ selected:{}, notes:"", expandedShow:"" },
     address:{ street:"", zip:"", city:"", mobile:"", home:"", email:"" },
+    address2:{ street:"", zip:"", city:"", mobile:"", home:"", email:"" },
     emergency:{ name:"", phone1:"", phone2:"" },
     heardAboutUs:"",
     consents:{},
@@ -927,6 +995,7 @@ function buildDemoState(){
   s.cruise = { roomOptionId:"", wantsRoommate:false, roommateName:"", diningTable:"חברים מהקבוצה" };
   s.shows = { selected:{}, notes:"נשמח להמלצה על מופעים פופולריים" };
   s.address = { street:"הרצל 12", zip:"6423901", city:"תל אביב", mobile:"0501234567", home:"035551234", email:"demo@example.com" };
+  s.address2 = { street:"הרצל 12", zip:"6423901", city:"תל אביב", mobile:"", home:"035551234", email:"" };
   s.emergency = { name:"יואב ישראלי", phone1:"0507654321", phone2:"039998877" };
   s.heardAboutUs = "אתר אינטרנט";
   s.consents = {
@@ -1016,6 +1085,8 @@ async function loadRuntimeConfig(){
     CONFIG.PROJECTS_TABLE = cfg.projectsTable || CONFIG.PROJECTS_TABLE;
     CONFIG.CRUISE_TABLE = cfg.cruiseTable || CONFIG.CRUISE_TABLE;
     CONFIG.SHOWS_TABLE = cfg.showsTable || CONFIG.SHOWS_TABLE;
+    CONFIG.PAYMENT_URL_1 = cfg.paymentUrl1 || "";
+    CONFIG.PAYMENT_URL_2 = cfg.paymentUrl2 || "";
   }catch(e){
     console.error("Failed to load /api/config", e);
   }
@@ -1468,6 +1539,48 @@ function showDescInfo(showRecord){
   );
 }
 
+function attachmentUrl(record, fieldName){
+  const val = record?.namedFields?.[fieldName];
+  if(!val) return "";
+  if(Array.isArray(val) && val.length){
+    const first = val[0];
+    if(first && typeof first === "object"){
+      return first.thumbnails?.large?.url || first.thumbnails?.small?.url || first.url || "";
+    }
+  }
+  if(typeof val === "string" && /^https?:\/\//.test(val)) return val;
+  return "";
+}
+
+function showImageUrl(rec){
+  const named = rec?.namedFields || {};
+  const imageKeys = ["EventImg","תמונה","תמונות","Image","Images","Photo","Photos","Thumbnail","Cover","תמונת כיסוי","Cover Image","תמונה ראשית"];
+
+  for(const key of imageKeys){
+    const val = named[key];
+    if(!val) continue;
+    if(Array.isArray(val) && val.length){
+      const first = val[0];
+      if(first && typeof first === "object"){
+        const thumb = first.thumbnails?.large?.url || first.thumbnails?.small?.url || first.url;
+        if(thumb) return thumb;
+      }
+    }
+    if(typeof val === "string" && /^https?:\/\//.test(val)) return val;
+  }
+
+  // Fallback: scan all named fields for any Airtable attachment shape
+  for(const val of Object.values(named)){
+    if(Array.isArray(val) && val.length){
+      const first = val[0];
+      if(first && typeof first === "object" && first.url && first.thumbnails){
+        return first.thumbnails?.large?.url || first.thumbnails?.small?.url || first.url;
+      }
+    }
+  }
+  return "";
+}
+
 function showPrice(rec){
   const fields = rec?.fields  || {};
   const named  = rec?.namedFields || {};
@@ -1523,7 +1636,7 @@ function buildPaymentSummary(){
     const p2 = numberFromField(secondaryUnit);
 
     if(travelers <= 1){
-      addComponent(`${label} - נוסע ראשי`, 1, p1, p1, options);
+      addComponent(`${label} - ${travelerLabel(0)}`, 1, p1, p1, options);
       return;
     }
 
@@ -1532,8 +1645,8 @@ function buildPaymentSummary(){
       return;
     }
 
-    addComponent(`${label} - נוסע ראשי`, 1, p1, p1, options);
-    addComponent(`${label} - נוסע נוסף`, 1, p2, p2, options);
+    addComponent(`${label} - ${travelerLabel(0)}`, 1, p1, p1, options);
+    addComponent(`${label} - ${travelerLabel(1)}`, 1, p2, p2, options);
   }
 
   if(basePerTraveler > 0){
@@ -1584,13 +1697,20 @@ function buildPaymentSummary(){
     today.setHours(0,0,0,0);
     const deadline = new Date(earlyBookingEndDate);
     if(!isNaN(deadline) && today <= deadline){
-      addComponent("הנחת רישום מוקדם", 1, -earlyBookingDiscountAmount, -earlyBookingDiscountAmount);
+      const count = Number(state.travelersCount || 1) || 1;
+      const total = earlyBookingDiscountAmount * count;
+      addComponent("הנחת רישום מוקדם", count, -earlyBookingDiscountAmount, -total);
     }
   }
 
   const estimatedTotal = components.reduce((sum, c)=>sum + numberFromField(c.amount), 0);
 
   return { travelers, components, estimatedTotal, notes };
+}
+
+function travelerLabel(idx){
+  const name = state.travelers[idx]?.fullNameHe?.trim();
+  return name || `מטייל ${idx + 1}`;
 }
 
 function isCruiseTrip(){
@@ -1657,11 +1777,12 @@ function renderApp(){
       <div class="mf-bp-topbar"></div>
       <div class="mf-bp-inner">
         <div class="mf-bp-top">
-          <img src="logo.jpg" class="mf-bp-logo" alt="לוגו תבל">
-          <span class="mf-bp-step-badge">שלב ${currentStepIndex+1} / ${steps.length}</span>
+          <img src="newlogo.png" class="mf-bp-logo" alt="לוגו תבל">
         </div>
-        <p class="mf-bp-trip-label">הרשמה ל${trip.fields[F.tripType] ? trip.fields[F.tripType] + ":" : "טיול:"}</p>
-        <h1 class="mf-bp-trip-name">${trip.fields[F.name] || ""}</h1>
+        <div class="mf-bp-trip-block">
+          <p class="mf-bp-trip-label">✦ הרשמה ל${trip.fields[F.tripType] || "טיול"} ✦</p>
+          <h1 class="mf-bp-trip-name">${trip.fields[F.name] || ""}</h1>
+        </div>
         <div class="mf-bp-journey-header">
           ${trip.fields[F.departDate] ? `<div class="mf-bp-date-side">${formatDateEuropean(trip.fields[F.departDate])}</div>` : "<div></div>"}
           ${trip.fields[F.returnDate] ? `<div class="mf-bp-date-side" style="text-align:left">${formatDateEuropean(trip.fields[F.returnDate])}</div>` : "<div></div>"}
@@ -1703,7 +1824,7 @@ function navButtons(container, opts={}){
   const nextStep = steps[currentStepIndex + 1];
 
   function nextButtonText(){
-    if(currentStepIndex === steps.length - 1) return "אישור ושליחת הזמנה לטיול בחו\"ל";
+    if(currentStepIndex === steps.length - 1) return "הכל מוכן — ממשיכים לתשלום המקדמה ←";
     if(step.id === "flight") return "ממשיכים לבחירות הטיול בחו\"ל";
     if(step.id === "consents") return "ממשיכים לסיכום תשלום וטיסות";
     if(nextStep?.id === "flight") return "ממשיכים להעדפות טיסה";
@@ -1834,10 +1955,10 @@ function renderPersonalStep(container){
       <div class="choice-card ${state.travelersCount==="1"?"selected":""}" data-count="1">מטייל אחד</div>
       <div class="choice-card ${state.travelersCount==="2"?"selected":""}" data-count="2">שני מטיילים</div>
     </div>
-    <div class="section-title">מטייל 1</div>
+    <div class="section-title" id="sectionTitle0">${travelerLabel(0)}</div>
     <div id="trav1">${travelerFieldsHtml(0)}</div>
     <div id="trav2Wrap" style="${state.travelersCount==="2"?"":"display:none"}">
-      <div class="section-title">מטייל 2</div>
+      <div class="section-title" id="sectionTitle1">${travelerLabel(1)}</div>
       <div id="trav2">${travelerFieldsHtml(1)}</div>
     </div>
   `;
@@ -1848,7 +1969,18 @@ function renderPersonalStep(container){
     };
   });
   bindInputs(container);
-  
+
+  // Live-update section titles as names are typed
+  [0, 1].forEach(idx => {
+    const input = container.querySelector(`#fullNameHe_${idx}`);
+    const title = container.querySelector(`#sectionTitle${idx}`);
+    if(input && title){
+      input.addEventListener("input", () => {
+        title.textContent = input.value.trim() || `מטייל ${idx + 1}`;
+      });
+    }
+  });
+
   // Add real-time validation listeners
   container.querySelectorAll("[data-validate-type]").forEach(input => {
     input.addEventListener("blur", () => {
@@ -1890,35 +2022,37 @@ function validatePersonalStep(){
   for(let i=0;i<count;i++){
     const trav = state.travelers[i];
     
+    const label = travelerLabel(i);
+
     // 1. Check all required fields are filled
     for(const f of need){
       if(!trav[f]){
-        alert(`נא למלא את כל השדות החיוניים למטייל ${i+1}`);
+        alert(`נא למלא את כל השדות החיוניים עבור ${label}`);
         return false;
       }
     }
-    
+
     // 2. Validate Hebrew name (only Hebrew letters and spaces)
     if(!isValidHebrewName(trav.fullNameHe)){
-      alert(`מטייל ${i+1}: שם מלא בעברית חייב להכיל רק אותיות בעברית. בדוק שנכתב בעברית בלבד.`);
+      alert(`${label}: שם מלא בעברית חייב להכיל רק אותיות בעברית. בדוק שנכתב בעברית בלבד.`);
       return false;
     }
-    
+
     // 3. Validate English first name (only English letters, spaces, hyphens)
     if(!isValidEnglishName(trav.firstNameEn)){
-      alert(`מטייל ${i+1}: First name חייב להכיל רק אותיות באנגלית (כפי שמופיע בדרכון).`);
+      alert(`${label}: First name חייב להכיל רק אותיות באנגלית (כפי שמופיע בדרכון).`);
       return false;
     }
-    
+
     // 4. Validate English last name (only English letters, spaces, hyphens)
     if(!isValidEnglishName(trav.lastNameEn)){
-      alert(`מטייל ${i+1}: Last name חייב להכיל רק אותיות באנגלית (כפי שמופיע בדרכון).`);
+      alert(`${label}: Last name חייב להכיל רק אותיות באנגלית (כפי שמופיע בדרכון).`);
       return false;
     }
-    
+
     // 5. Validate passport number (only digits)
     if(!isValidPassportNumber(trav.passportNum)){
-      alert(`מטייל ${i+1}: מספר דרכון חייב להכיל מספרים בלבד.`);
+      alert(`${label}: מספר דרכון חייב להכיל מספרים בלבד.`);
       return false;
     }
   }
@@ -1980,9 +2114,9 @@ function renderFlightStep(container){
     </div>
     
     <div id="flightDetailsWrap" style="${state.independentFlight?"display:none":""}">
-      <div class="section-title">מטייל 1</div>
+      <div class="section-title">${travelerLabel(0)}</div>
       ${flightFieldsHtml(0)}
-      ${count===2?`<div class="section-title">מטייל 2</div>${flightFieldsHtml(1)}`:""}
+      ${count===2?`<div class="section-title">${travelerLabel(1)}</div>${flightFieldsHtml(1)}`:""}
     </div>
 
     <div class="switch-row">
@@ -2033,9 +2167,16 @@ function renderCruiseStep(container){
       </div>`;
   }).join("") : `<p class="hint">לא נמצאו אפשרויות תא לטיול זה — ניתן להמשיך, ונחזור אליכם בנושא.</p>`;
 
+  const deckPlanUrl = attachmentUrl(trip, "Cabin Deck Plan");
+
   container.innerHTML = `
     <h2>הרשמה לשייט</h2>
     <p class="sub">בחרו את סוג התא המועדף</p>
+    ${deckPlanUrl ? `
+    <div class="deck-plan-wrap">
+      <div class="deck-plan-label">מפת סיפון התאים</div>
+      <img src="${deckPlanUrl}" alt="מפת סיפון" id="deckPlanImg" loading="lazy">
+    </div>` : ""}
     <div id="roomList">${optionsHtml}</div>
 
     <div class="switch-row">
@@ -2053,6 +2194,10 @@ function renderCruiseStep(container){
     el.onclick = ()=>{ state.cruise.roomOptionId = el.dataset.id; renderCruiseStep(container); };
   });
   bindInputs(container);
+  const deckImg = container.querySelector("#deckPlanImg");
+  if(deckImg){
+    deckImg.onclick = ()=> deckImg.classList.toggle("zoomed");
+  }
   container.querySelector("#wantsRoommate").onchange = (e)=>{
     state.cruise.wantsRoommate = e.target.checked;
     document.getElementById("roommateNameWrap").style.display = e.target.checked? "":"none";
@@ -2098,12 +2243,13 @@ function renderShowsStep(container){
   }
 
   function catExtraFields(cat){
-    const skip = new Set(["Name","\u05e9\u05dd","Category","\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4","Tier","Level","Section","\u05e1\u05d5\u05d2","\u05e8\u05de\u05d4",
-      "Ticket price","Ticket Price","Price","\u05de\u05d7\u05d9\u05e8","\u05de\u05d7\u05d9\u05e8 \u05db\u05e8\u05d8\u05d9\u05e1","\u05e2\u05dc\u05d5\u05ea",
-      "Total tickets for sale","Capacity","\u05e7\u05d9\u05d1\u05d5\u05dc\u05ea","\u05de\u05e1\u05e4\u05e8 \u05de\u05e7\u05d5\u05de\u05d5\u05ea",
-      "Status","\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1","\u05d6\u05de\u05d9\u05e0\u05d5\u05ea",
-      "RecordID","EventNane","MofaID","Show","\u05de\u05d5\u05e4\u05e2","Project","\u05de\u05d6\u05d4\u05d4 \u05e4\u05e8\u05d5\u05d9\u05d9\u05e7\u05d8",
-      "\u05e9\u05dd \u05e4\u05e8\u05d5\u05d9\u05d9\u05e7\u05d8 (from Project)","EventNane (from EventNane)"]);
+    const skip = new Set(["Name","שם","Category","קטגוריה","Tier","Level","Section","סוג","רמה",
+      "Ticket price","Ticket Price","Price","מחיר","מחיר כרטיס","עלות","price","ticket_price","PriceILS",
+      "Total tickets for sale","Capacity","קיבולת","מספר מקומות",
+      "Status","סטאטוס","זמינות","CategoryType","Category Type","סוג קטגוריה",
+      "RecordID","EventNane","MofaID","Show","מופע","Project","מזהה פרויקט",
+      "שם פרויקט (from Project)","EventNane (from EventNane)",
+      "תמונה","תמונות","Image","Images","Photo","Photos","Thumbnail","Cover","תמונת כיסוי","Cover Image","תמונה ראשית","EventImg"]);
     return showAllTextFields(cat).filter(({key})=>!skip.has(key));
   }
 
@@ -2119,33 +2265,33 @@ function renderShowsStep(container){
     const lineTotal = checked ? unit * qty : 0;
     const label     = catLabel(cat);
     const capacity  = catCapacity(cat);
-    const status    = catStatus(cat);
     const extras    = catExtraFields(cat);
+    const imgUrl    = showImageUrl(cat);
+
+    const chips = [
+      ...(capacity ? [{key:"מקומות זמינים", value:capacity}] : []),
+      ...extras
+    ];
 
     return `
       <div class="room-option show-ticket ${checked?"selected":""}" data-show-id="${cat.id}">
+        ${imgUrl ? `<div class="show-ticket-img"><img src="${imgUrl}" alt="${label}" loading="lazy"></div>` : ""}
         <div class="show-ticket-main">
           <span class="show-ticket-title">${label}</span>
-          <span class="show-ticket-price">${unit > 0 ? formatTripAmount(unit) : "\u05de\u05d7\u05d9\u05e8 \u05d9\u05d9\u05e7\u05d1\u05e2 \u05d1\u05d4\u05de\u05e9\u05da"}</span>
+          <span class="show-ticket-price">${unit > 0 ? formatTripAmount(unit) : "מחיר ייקבע בהמשך"}</span>
         </div>
-        <div class="room-details" style="display:block;">
-          ${status    ? `<div class="room-detail-row"><span class="k">\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1</span><span>${status}</span></div>` : ""}
-          ${capacity  ? `<div class="room-detail-row"><span class="k">\u05de\u05e7\u05d5\u05de\u05d5\u05ea \u05d6\u05de\u05d9\u05e0\u05d9\u05dd</span><span>${capacity}</span></div>` : ""}
-          ${extras.map(({key,value})=>`<div class="room-detail-row"><span class="k">${key}</span><span class="show-detail-text">${value}</span></div>`).join("")}
-          <div class="room-detail-row" style="margin-top:8px;">
-            <label class="show-ticket-check">
-              <input type="checkbox" class="show-check" data-show-id="${cat.id}" ${checked?"checked":""}>
-              <span>${checked ? "\u2713 \u05e0\u05d1\u05d7\u05e8" : "\u05d1\u05d7\u05e8 \u05e1\u05d5\u05d2 \u05db\u05e8\u05d8\u05d9\u05e1 \u05d6\u05d4"}</span>
-            </label>
-          </div>
-          <div class="room-detail-row">
-            <span class="k">\u05db\u05de\u05d5\u05ea \u05db\u05e8\u05d8\u05d9\u05e1\u05d9\u05dd</span>
+        ${chips.length ? `<div class="show-cat-chips">${chips.map(({key,value})=>`<span class="show-cat-chip"><span class="k">${key}:</span> ${value}</span>`).join("")}</div>` : ""}
+        <div class="show-ticket-action">
+          <label class="show-ticket-check">
+            <input type="checkbox" class="show-check" data-show-id="${cat.id}" ${checked?"checked":""}>
+            <span>${checked ? "✓ נבחר" : "בחר סוג כרטיס זה"}</span>
+          </label>
+          <div class="show-ticket-qty-area">
+            <span class="k">כמות:</span>
             <input type="number" min="1" step="1" class="show-qty show-qty-input"
-              data-show-id="${cat.id}" value="${qty>0?qty:1}" ${checked?"":"disabled"}>
-          </div>
-          <div class="room-detail-row">
-            <span class="k">\u05e1\u05db\u05d5\u05dd</span>
-            <span style="font-weight:${checked&&unit>0?"700":"400"}">${checked&&unit>0 ? formatTripAmount(lineTotal) : "\u2014"}</span>
+              data-show-id="${cat.id}" value="${qty>0?qty:1}" ${checked?"":"disabled"}
+              style="width:72px;">
+            <span class="show-ticket-total-val">${checked && unit > 0 ? formatTripAmount(lineTotal) : ""}</span>
           </div>
         </div>
       </div>`;
@@ -2158,6 +2304,7 @@ function renderShowsStep(container){
     const venue_  = showFieldText(n["EventVenue"]||n["\u05d0\u05d5\u05dc\u05dd"]||n["\u05de\u05e7\u05d5\u05dd"]||n["Venue"]);
     const desc_   = showFieldText(n["Description"]||n["\u05ea\u05d9\u05d0\u05d5\u05e8"]||n["Notes"]);
     const status_ = showFieldText(n["Status"]||n["\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1"]);
+    const imgUrl  = showRec ? showImageUrl(showRec) : (categories.length ? showImageUrl(categories[0]) : "");
     const isOpen  = state.shows.expandedShow === groupKey;
     const selCnt  = showSelCount(categories);
     const ticketsHtml = categories.map(buildCategoryCard).join("");
@@ -2175,6 +2322,7 @@ function renderShowsStep(container){
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            ${imgUrl ? `<div class="show-group-img"><img src="${imgUrl}" alt="${showName}" loading="lazy"></div>` : ""}
             ${selCnt > 0
               ? `<span class="show-group-sub" style="background:#f0e8ed;color:#7c1836;border-color:#d4afc0;">\u2713 ${selCnt} \u05e0\u05d1\u05d7\u05e8\u05d5</span>`
               : `<span class="show-group-sub">${categories.length} \u05e1\u05d5\u05d2\u05d9 \u05db\u05e8\u05d8\u05d9\u05e1\u05d9\u05dd</span>`}
@@ -2256,26 +2404,45 @@ function renderShowsStep(container){
    Step: כתובת ותקשורת
    ====================================================================== */
 function renderAddressStep(container){
-  const a = state.address, e = state.emergency;
+  const twoTravelers = state.travelersCount === "2";
+
+  if(twoTravelers){
+    const a1 = state.address, a2 = state.address2;
+    if(!a2.street && a1.street) a2.street = a1.street;
+    if(!a2.zip    && a1.zip)    a2.zip    = a1.zip;
+    if(!a2.city   && a1.city)   a2.city   = a1.city;
+    if(!a2.home   && a1.home)   a2.home   = a1.home;
+  }
+
+  function addressBlock(obj, prefix, sectionLabel){
+    return `
+      ${sectionLabel ? `<div class="section-title">${sectionLabel}</div>` : ""}
+      <div class="row2">
+        <div class="field"><label>רחוב ומספר <span class="req">*</span></label>
+          <input type="text" data-bind="${prefix}.street" value="${obj.street}"></div>
+        <div class="field"><label>מיקוד</label>
+          <input type="text" data-bind="${prefix}.zip" value="${obj.zip}"></div>
+      </div>
+      <div class="field"><label>עיר <span class="req">*</span></label>
+        <input type="text" data-bind="${prefix}.city" value="${obj.city}"></div>
+      <div class="row2">
+        <div class="field"><label>נייד <span class="req">*</span></label>
+          <input type="tel" data-bind="${prefix}.mobile" value="${obj.mobile}"></div>
+        <div class="field"><label>טלפון בית</label>
+          <input type="tel" data-bind="${prefix}.home" value="${obj.home}"></div>
+      </div>
+      <div class="field"><label>דוא"ל <span class="req">*</span></label>
+        <input type="email" data-bind="${prefix}.email" value="${obj.email}"></div>
+    `;
+  }
+
+  const e = state.emergency;
   container.innerHTML = `
     <h2>כתובת ותקשורת</h2>
-    <div class="row2">
-      <div class="field"><label>רחוב ומספר <span class="req">*</span></label>
-        <input type="text" data-bind="address.street" value="${a.street}"></div>
-      <div class="field"><label>מיקוד</label>
-        <input type="text" data-bind="address.zip" value="${a.zip}"></div>
-    </div>
-    <div class="field"><label>עיר <span class="req">*</span></label>
-      <input type="text" data-bind="address.city" value="${a.city}"></div>
-
-    <div class="row2">
-      <div class="field"><label>נייד <span class="req">*</span></label>
-        <input type="tel" data-bind="address.mobile" value="${a.mobile}"></div>
-      <div class="field"><label>טלפון בית</label>
-        <input type="tel" data-bind="address.home" value="${a.home}"></div>
-    </div>
-    <div class="field"><label>דוא"ל <span class="req">*</span></label>
-      <input type="email" data-bind="address.email" value="${a.email}"></div>
+    ${twoTravelers
+      ? addressBlock(state.address,  "address",  travelerLabel(0)) +
+        addressBlock(state.address2, "address2", travelerLabel(1))
+      : addressBlock(state.address,  "address",  "")}
 
     <div class="section-title">איש קשר למקרה חירום</div>
     <div class="field"><label>שם <span class="req">*</span></label>
@@ -2301,10 +2468,17 @@ function renderAddressStep(container){
   navButtons(container);
 }
 function validateAddressStep(){
-  const a=state.address, e=state.emergency;
+  const a = state.address, e = state.emergency;
   if(!a.street||!a.city||!a.mobile||!a.email||!e.name||!e.phone1){
-    alert("נא למלא את כל שדות החובה");
+    alert(`נא למלא את כל שדות החובה של ${travelerLabel(0)}`);
     return false;
+  }
+  if(state.travelersCount === "2"){
+    const a2 = state.address2;
+    if(!a2.street||!a2.city||!a2.mobile||!a2.email){
+      alert(`נא למלא את כל שדות החובה של ${travelerLabel(1)}`);
+      return false;
+    }
   }
   return true;
 }
@@ -2544,7 +2718,7 @@ function renderPaymentStep(container){
   const earlyBookingHtml = earlyBookingEndDate ? `
     <div class="info-box" style="background:#F5F5F5; border-color:#D0D0D0; color:#424242;">
       <strong>הנחת רישום מוקדם</strong><br>
-      הרשמה מוקדמת עד לתאריך ${formatDateEuropean(earlyBookingEndDate)} - הנחה בסך 75 ${tripCurrency()}
+      הרשמה מוקדמת עד לתאריך ${formatDateEuropean(earlyBookingEndDate)} - הנחה בסך 75 ${tripCurrency()} למטייל
     </div>
   ` : "";
 
@@ -2566,7 +2740,7 @@ function renderPaymentStep(container){
   const paymentTermsHtml = `
     <div class="info-box" style="background:#FFF9E6; border-color:#FFE680; color:#7A6D00;">
       <strong>תנאי התשלום</strong><br><br>
-      <strong>מקדמה מיידית</strong> שהיא מהווה דמי הרשמה וטיפול בסך 1200 ${tripCurrency()},
+      <strong>מקדמה מיידית</strong> שהיא מהווה דמי הרשמה וטיפול בסך 1,200 ₪,
       משולמת היום בכרטיס אשראי (בלבד).
       לאחר שליחת הטופס, תועברו לדף סליקה עבור המקדמה, ולאחר התשלום תקבלו אישור רישום במייל.<br><br>
       <strong>השלמת תשלום</strong> לפי מסלולי תשלום לבחירתך:
@@ -2715,7 +2889,15 @@ async function submitForm(){
     });
     if(!res.ok) throw new Error("submit failed");
     const result = await res.json();
-    renderDone(result.mode === "dry-run");
+
+    const travelerCount = String(state.travelersCount || "1").trim();
+    const paymentUrl = travelerCount === "2" ? CONFIG.PAYMENT_URL_2 : CONFIG.PAYMENT_URL_1;
+
+    if(paymentUrl){
+      window.location.href = paymentUrl;
+    } else {
+      renderDone(result.mode === "dry-run");
+    }
   }catch(e){
     console.error(e);
     alert("אירעה שגיאה בשליחת הטופס. נסו שוב, או פנו אלינו.");
@@ -2738,7 +2920,7 @@ function renderWaitlistForm(){
           <div class="wl-header-topbar"></div>
           <div class="wl-header-inner">
             <div class="wl-header-top">
-              <img src="logo.jpg" class="wl-logo" alt="לוגו תבל">
+              <img src="newlogo.png" class="wl-logo" alt="לוגו תבל">
               <span class="wl-status-badge">WAITLIST</span>
             </div>
             <div class="wl-route">
