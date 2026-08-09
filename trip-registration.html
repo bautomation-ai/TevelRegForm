@@ -2074,6 +2074,8 @@ function flightFieldsHtml(idx){
         <option ${t.meal==="צמחונית"?"selected":""}>צמחונית</option>
         <option ${t.meal==="טבעונית"?"selected":""}>טבעונית</option>
         <option ${t.meal==="ללא גלוטן"?"selected":""}>ללא גלוטן</option>
+        <option ${t.meal==="ללא לקטוז"?"selected":""}>ללא לקטוז</option>
+        <option ${t.meal==="פירות"?"selected":""}>פירות</option>
         <option ${t.meal==="כשרה"?"selected":""}>כשרה</option>
       </select></div>
     <div class="row2">
@@ -2179,6 +2181,7 @@ function renderCruiseStep(container){
     </div>` : ""}
     <div id="roomList">${optionsHtml}</div>
 
+    ${state.travelersCount !== "2" ? `
     <div class="switch-row">
       <span class="lbl">מעוניין/ת בשותף/ת לחדר</span>
       <label class="switch"><input type="checkbox" id="wantsRoommate" ${state.cruise.wantsRoommate?"checked":""}><span class="slider"></span></label>
@@ -2186,7 +2189,7 @@ function renderCruiseStep(container){
     <div class="field" id="roommateNameWrap" style="${state.cruise.wantsRoommate?"":"display:none"}">
       <label>שם השותף/ה</label>
       <input type="text" data-bind="cruise.roommateName" value="${state.cruise.roommateName}">
-    </div>
+    </div>` : ""}
     <div class="field"><label>בחדר האוכל בספינה מבקש/ת לשבת עם (עד 6 איש בשולחן)</label>
       <textarea rows="2" data-bind="cruise.diningTable">${state.cruise.diningTable}</textarea></div>
   `;
@@ -2198,10 +2201,13 @@ function renderCruiseStep(container){
   if(deckImg){
     deckImg.onclick = ()=> deckImg.classList.toggle("zoomed");
   }
-  container.querySelector("#wantsRoommate").onchange = (e)=>{
-    state.cruise.wantsRoommate = e.target.checked;
-    document.getElementById("roommateNameWrap").style.display = e.target.checked? "":"none";
-  };
+  const roommateChk = container.querySelector("#wantsRoommate");
+  if(roommateChk){
+    roommateChk.onchange = (e)=>{
+      state.cruise.wantsRoommate = e.target.checked;
+      document.getElementById("roommateNameWrap").style.display = e.target.checked? "":"none";
+    };
+  }
   navButtons(container);
 }
 function validateCruiseStep(){
@@ -2784,7 +2790,7 @@ function renderPaymentStep(container){
         <option value="">בחר/י</option>
         <option ${p.method==="כרטיס אשראי"?"selected":""}>כרטיס אשראי</option>
         <option ${p.method==="העברה בנקאית"?"selected":""}>העברה בנקאית</option>
-        <option ${p.method==="מזומן"?"selected":""}>מזומן</option>
+        <option ${p.method==="מזומן"?"selected":""}>מזומן (שטרות)</option>
       </select></div>
 
     <div class="field"><label>תאריך</label>
