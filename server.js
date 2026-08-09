@@ -203,6 +203,46 @@ app.get("/api/cruise-options/by-trip/:tripId", async (req, res) => {
   }
 });
 
+function flattenPayload(p) {
+  const f = {};
+  f.trip_id        = p.trip_id        || "";
+  f.trip_name      = p.trip_name      || "";
+  f.trip_type      = p.trip_type      || "";
+  f.submitted_at   = p.submitted_at   || "";
+  f.travelers_count = String(p.travelersCount || "1");
+
+  (p.travelers || []).forEach((t, i) => {
+    const n = i + 1;
+    f[`traveler${n}_firstName`]      = t.firstName      || "";
+    f[`traveler${n}_lastName`]       = t.lastName       || "";
+    f[`traveler${n}_passport`]       = t.passport       || "";
+    f[`traveler${n}_birthDate`]      = t.birthDate      || "";
+    f[`traveler${n}_nationality`]    = t.nationality    || "";
+    f[`traveler${n}_passportExpiry`] = t.passportExpiry || "";
+    f[`traveler${n}_phone`]          = t.phone          || "";
+    f[`traveler${n}_email`]          = t.email          || "";
+    f[`traveler${n}_meal`]           = t.meal           || "";
+    f[`traveler${n}_frequentFlyer`]  = t.frequentFlyer  || "";
+    f[`traveler${n}_seat`]           = t.seat           || "";
+    f[`traveler${n}_flightRequests`] = t.flightRequests || "";
+  });
+
+  const c = p.cruise || {};
+  f.cruise_roomOptionId  = c.roomOptionId  || "";
+  f.cruise_wantsRoommate = c.wantsRoommate ? "כן" : "לא";
+  f.cruise_roommateName  = c.roommateName  || "";
+  f.cruise_diningTable   = c.diningTable   || "";
+
+  const pay = p.payment || {};
+  f.payment_frequentTraveler      = pay.frequentTraveler ? "כן" : "לא";
+  f.payment_frequentTravelerTrips = pay.frequentTravelerTrips || "";
+  f.payment_method                = pay.method || "";
+  f.payment_date                  = pay.date   || "";
+  // signatureData excluded (base64 image)
+
+  return f;
+}
+
 app.post("/api/submissions", async (req, res) => {
   const payload = req.body || {};
 
@@ -215,7 +255,7 @@ app.post("/api/submissions", async (req, res) => {
     const webhookRes = await fetch(SUBMIT_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(flattenPayload(payload))
     });
 
     if (!webhookRes.ok) {
