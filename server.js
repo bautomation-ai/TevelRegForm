@@ -205,27 +205,52 @@ app.get("/api/cruise-options/by-trip/:tripId", async (req, res) => {
 
 function flattenPayload(p) {
   const f = {};
-  f.trip_id        = p.trip_id        || "";
-  f.trip_name      = p.trip_name      || "";
-  f.trip_type      = p.trip_type      || "";
-  f.submitted_at   = p.submitted_at   || "";
+  f.trip_id        = p.trip_id      || "";
+  f.trip_name      = p.trip_name    || "";
+  f.trip_type      = p.trip_type    || "";
+  f.submitted_at   = p.submitted_at || "";
   f.travelers_count = String(p.travelersCount || "1");
+  f.independent_flight = p.independentFlight ? "כן" : "לא";
+  f.insurance_opt_in   = p.insuranceOptIn    ? "כן" : "לא";
+  f.insurance_follow_up           = p.insuranceOfferFollowUp           ? "כן" : "לא";
+  f.insurance_parallel_confirmed  = p.insuranceOfferParallelConfirmed  ? "כן" : "לא";
+  f.heard_about_us = p.heardAboutUs || "";
 
   (p.travelers || []).forEach((t, i) => {
     const n = i + 1;
-    f[`traveler${n}_firstName`]      = t.firstName      || "";
-    f[`traveler${n}_lastName`]       = t.lastName       || "";
-    f[`traveler${n}_passport`]       = t.passport       || "";
-    f[`traveler${n}_birthDate`]      = t.birthDate      || "";
-    f[`traveler${n}_nationality`]    = t.nationality    || "";
-    f[`traveler${n}_passportExpiry`] = t.passportExpiry || "";
-    f[`traveler${n}_phone`]          = t.phone          || "";
-    f[`traveler${n}_email`]          = t.email          || "";
-    f[`traveler${n}_meal`]           = t.meal           || "";
-    f[`traveler${n}_frequentFlyer`]  = t.frequentFlyer  || "";
-    f[`traveler${n}_seat`]           = t.seat           || "";
-    f[`traveler${n}_flightRequests`] = t.flightRequests || "";
+    f[`traveler${n}_fullNameHe`]      = t.fullNameHe      || "";
+    f[`traveler${n}_firstNameEn`]     = t.firstNameEn     || "";
+    f[`traveler${n}_lastNameEn`]      = t.lastNameEn      || "";
+    f[`traveler${n}_passportNum`]     = t.passportNum     || "";
+    f[`traveler${n}_passportExpiry`]  = t.passportExpiry  || "";
+    f[`traveler${n}_dob`]             = t.dob             || "";
+    f[`traveler${n}_profession`]      = t.profession      || "";
+    f[`traveler${n}_meal`]            = t.meal            || "";
+    f[`traveler${n}_frequentFlyer`]   = t.frequentFlyer   || "";
+    f[`traveler${n}_seat`]            = t.seat            || "";
+    f[`traveler${n}_flightRequests`]  = t.flightRequests  || "";
   });
+
+  const addr = p.address || {};
+  f.address_street = addr.street || "";
+  f.address_city   = addr.city   || "";
+  f.address_zip    = addr.zip    || "";
+  f.address_mobile = addr.mobile || "";
+  f.address_home   = addr.home   || "";
+  f.address_email  = addr.email  || "";
+
+  const addr2 = p.address2 || {};
+  f.address2_street = addr2.street || "";
+  f.address2_city   = addr2.city   || "";
+  f.address2_zip    = addr2.zip    || "";
+  f.address2_mobile = addr2.mobile || "";
+  f.address2_home   = addr2.home   || "";
+  f.address2_email  = addr2.email  || "";
+
+  const em = p.emergency || {};
+  f.emergency_name   = em.name   || "";
+  f.emergency_phone1 = em.phone1 || "";
+  f.emergency_phone2 = em.phone2 || "";
 
   const c = p.cruise || {};
   f.cruise_roomOptionId  = c.roomOptionId  || "";
@@ -233,12 +258,25 @@ function flattenPayload(p) {
   f.cruise_roommateName  = c.roommateName  || "";
   f.cruise_diningTable   = c.diningTable   || "";
 
+  const sh = p.shows || {};
+  f.shows_notes    = sh.notes || "";
+  f.shows_selected = Object.entries(sh.selected || {})
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+    .join(", ");
+
   const pay = p.payment || {};
   f.payment_frequentTraveler      = pay.frequentTraveler ? "כן" : "לא";
   f.payment_frequentTravelerTrips = pay.frequentTravelerTrips || "";
   f.payment_method                = pay.method || "";
   f.payment_date                  = pay.date   || "";
   // signatureData excluded (base64 image)
+
+  const consents = p.consents || {};
+  f.consents = Object.entries(consents)
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+    .join(", ");
 
   return f;
 }
