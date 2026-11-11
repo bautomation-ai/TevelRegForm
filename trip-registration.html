@@ -313,6 +313,32 @@
     color:var(--maroon-dark);
   }
 
+  /* ---- Multi-select chips (אוכל בטיול) ---- */
+  .chip-grid{display:flex;flex-wrap:wrap;gap:8px;}
+  .field label.chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    font-weight:400;
+    color:var(--ink);
+    border:1.5px solid var(--border);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:14px;
+    cursor:pointer;
+    background:#fff;
+    transition:.15s;
+    user-select:none;
+  }
+  .field label.chip input{margin:0;width:16px;height:16px;accent-color:var(--maroon);}
+  .field label.chip.selected{
+    border-color:var(--maroon);
+    background:var(--sage-light);
+    color:var(--maroon-dark);
+    font-weight:600;
+  }
+
   .switch-row{
     display:flex;
     align-items:center;
@@ -330,7 +356,7 @@
   .slider{position:absolute;inset:0;background:#D9D2CC;border-radius:30px;cursor:pointer;transition:.15s;}
   .slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
   input:checked + .slider{background:var(--maroon);}
-  input:checked + .slider::before{transform:translateX(-18px);}
+  input:checked + .slider::before{transform:translateX(18px);}
 
   .checkbox-row{
     display:flex;
@@ -948,6 +974,17 @@ const SHOW_F = {
 
 const CRUISE_TRIP_TYPES = ["שייט רגיל", "שייט צרטר"];
 
+// אפשרויות האוכל — משותפות לארוחה בטיסה (בחירה אחת) ולאוכל בטיול (בחירה מרובה)
+const MEAL_OPTIONS = ["רגילה", "צמחונית", "טבעונית", "ללא גלוטן", "ללא לקטוז", "פירות", "כשרה"];
+
+// שאלת ההמשך של "מעוניין/ת להזמין דרככם טיסות אחרות"
+const ALT_FLIGHT_OPTIONS = [
+  "אני מעוניין/ת לצאת לפני הקבוצה",
+  "אני מעוניין/ת לחזור אחרי הקבוצה",
+  "אני מעוניין/ת לשדרג למחלקת עסקים באותן הטיסות",
+  "אחר"
+];
+
 function todayISO(){
   return new Date().toISOString().slice(0,10);
 }
@@ -957,11 +994,16 @@ function buildEmptyState(){
     travelersCount: "1",
     travelers: [
       { fullNameHe:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
+        tripFood:[], foodRestrictions:"",
         meal:"", frequentFlyer:"", seat:"", flightRequests:"" },
       { fullNameHe:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
+        tripFood:[], foodRestrictions:"",
         meal:"", frequentFlyer:"", seat:"", flightRequests:"" }
     ],
     independentFlight:false,
+    altFlights:false,
+    altFlightOptions:[],
+    altFlightOther:"",
     insuranceOptIn:false,
     insuranceOfferFollowUp:false,
     insuranceOfferParallelConfirmed:false,
@@ -982,11 +1024,13 @@ function buildDemoState(){
   s.travelers[0] = {
     fullNameHe:"ישראל ישראלי", firstNameEn:"ISRAEL", lastNameEn:"ISRAELI", passportNum:"12345678",
     passportExpiry:"2028-12-31", dob:"1985-04-15", profession:"מהנדס",
+    tripFood:["רגילה"], foodRestrictions:"",
     meal:"רגילה", frequentFlyer:"LY12345", seat:"חלון", flightRequests:""
   };
   s.travelers[1] = {
     fullNameHe:"דנה ישראלי", firstNameEn:"DANA", lastNameEn:"ISRAELI", passportNum:"87654321",
     passportExpiry:"2029-05-31", dob:"1988-09-22", profession:"מנהלת פרויקטים",
+    tripFood:["צמחונית", "ללא לקטוז"], foodRestrictions:"אלרגיה לאגוזים",
     meal:"צמחונית", frequentFlyer:"LY67890", seat:"מעבר", flightRequests:""
   };
   s.insuranceOptIn = true;
@@ -1944,7 +1988,43 @@ function travelerFieldsHtml(idx){
         <label>מקצוע</label>
         <input type="text" data-bind="travelers.${idx}.profession" value="${t.profession}"></div>
     </div>
+    ${tripFoodFieldsHtml(idx)}
   `;
+}
+
+function tripFoodFieldsHtml(idx){
+  const t = state.travelers[idx];
+  const chosen = Array.isArray(t.tripFood) ? t.tripFood : [];
+  return `
+    <div class="field">
+      <label>אוכל בטיול — סמנו את כל מה שמתאים לכם</label>
+      <div class="chip-grid">
+        ${MEAL_OPTIONS.map(opt=>{
+          const on = chosen.includes(opt);
+          return `<label class="chip ${on?"selected":""}">
+            <input type="checkbox" data-trip-food="${idx}" value="${opt}" ${on?"checked":""}>${opt}
+          </label>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="field">
+      <label>מגבלות מזון</label>
+      <textarea rows="2" data-bind="travelers.${idx}.foodRestrictions" placeholder="למשל: אלרגיה לאגוזים, רגישות למזון מסוים">${t.foodRestrictions || ""}</textarea>
+    </div>
+  `;
+}
+
+function bindTripFood(container){
+  container.querySelectorAll("[data-trip-food]").forEach(cb=>{
+    cb.addEventListener("change", ()=>{
+      const t = state.travelers[parseInt(cb.dataset.tripFood,10)];
+      const set = new Set(Array.isArray(t.tripFood) ? t.tripFood : []);
+      if(cb.checked) set.add(cb.value); else set.delete(cb.value);
+      // שומרים לפי סדר האפשרויות, לא לפי סדר הלחיצה
+      t.tripFood = MEAL_OPTIONS.filter(o=>set.has(o));
+      cb.closest(".chip").classList.toggle("selected", cb.checked);
+    });
+  });
 }
 
 function renderPersonalStep(container){
@@ -1969,6 +2049,7 @@ function renderPersonalStep(container){
     };
   });
   bindInputs(container);
+  bindTripFood(container);
 
   // Live-update section titles as names are typed
   [0, 1].forEach(idx => {
@@ -2070,13 +2151,7 @@ function flightFieldsHtml(idx){
     <div class="field"><label>ארוחה בטיסה</label>
       <select data-bind="travelers.${idx}.meal">
         <option value="">בחר/י</option>
-        <option ${t.meal==="רגילה"?"selected":""}>רגילה</option>
-        <option ${t.meal==="צמחונית"?"selected":""}>צמחונית</option>
-        <option ${t.meal==="טבעונית"?"selected":""}>טבעונית</option>
-        <option ${t.meal==="ללא גלוטן"?"selected":""}>ללא גלוטן</option>
-        <option ${t.meal==="ללא לקטוז"?"selected":""}>ללא לקטוז</option>
-        <option ${t.meal==="פירות"?"selected":""}>פירות</option>
-        <option ${t.meal==="כשרה"?"selected":""}>כשרה</option>
+        ${MEAL_OPTIONS.map(o=>`<option ${t.meal===o?"selected":""}>${o}</option>`).join("")}
       </select></div>
     <div class="row2">
       <div class="field"><label>מספר נוסע מתמיד</label>
@@ -2094,7 +2169,7 @@ function flightFieldsHtml(idx){
     <div class="info-box" style="margin-bottom:16px;">
       <div style="font-weight:600; margin-bottom:6px;">שדרוג למושב מועדף או למחלקת עסקים - בתשלום נוסף</div>
       <div style="margin-bottom:8px;">(המחיר דינאמי בהתאם לזמינות ומועד הכרטוס בכפוף לתנאים הרשומים בתכנית הטיול)</div>
-      <div style="font-weight:600;">יש לפנות למשרד</div>
+      <div style="font-weight:600;">לאחר סיום תהליך ההרשמה יש לפנות למשרד</div>
     </div>
   `;
 }
@@ -2105,11 +2180,33 @@ function renderFlightStep(container){
     <h2>העדפות בטיסה</h2>
     <p class="sub">פרטי הטיסה הקבוצתית עבור המטיילים</p>
 
+    ${state.altFlights ? "" : `
     <div class="switch-row">
       <span class="lbl">אני מטפל/ת בהזמנת הטיסה באופן עצמאי (לא מצטרף/ת לטיסת הקבוצה)</span>
       <label class="switch"><input type="checkbox" id="independentFlight" ${state.independentFlight?"checked":""}><span class="slider"></span></label>
+    </div>`}
+
+    <div class="switch-row">
+      <span class="lbl">מעוניין/ת להזמין דרככם טיסות אחרות לטיול הזה</span>
+      <label class="switch"><input type="checkbox" id="altFlights" ${state.altFlights?"checked":""}><span class="slider"></span></label>
     </div>
-    
+
+    ${state.altFlights ? `
+    <div class="field">
+      <label>מה תרצו? (אפשר לסמן כמה)</label>
+      <div class="chip-grid">
+        ${ALT_FLIGHT_OPTIONS.map(opt=>{
+          const on = state.altFlightOptions.includes(opt);
+          return `<label class="chip ${on?"selected":""}"><input type="checkbox" data-alt-flight value="${opt}" ${on?"checked":""}>${opt}</label>`;
+        }).join("")}
+      </div>
+    </div>
+    ${state.altFlightOptions.includes("אחר") ? `
+    <div class="field">
+      <label>פרטו בבקשה</label>
+      <textarea rows="2" data-bind="altFlightOther">${state.altFlightOther || ""}</textarea>
+    </div>` : ""}` : ""}
+
     <div id="independentFlightNotice" class="info-box" style="display:${state.independentFlight?"block":"none"}; margin-bottom:20px;">
       <div style="font-weight:600; margin-bottom:8px;">רכישת כרטיס טיסה באופן עצמאי</div>
       <div>בבחירה זו לא יוצגו אפשרויות הטיסה של הטיול, והטיפול ברכישת כרטיס הטיסה ובתיאום מועדי ההגעה יהיה באחריות המטייל.</div>
@@ -2127,11 +2224,29 @@ function renderFlightStep(container){
     </div>
   `;
   bindInputs(container);
-  container.querySelector("#independentFlight").onchange = (e)=>{
-    state.independentFlight = e.target.checked;
-    document.getElementById("flightDetailsWrap").style.display = e.target.checked ? "none":"";
-    document.getElementById("independentFlightNotice").style.display = e.target.checked ? "block":"none";
+  const indep = container.querySelector("#independentFlight");
+  if(indep){
+    indep.onchange = (e)=>{
+      state.independentFlight = e.target.checked;
+      document.getElementById("flightDetailsWrap").style.display = e.target.checked ? "none":"";
+      document.getElementById("independentFlightNotice").style.display = e.target.checked ? "block":"none";
+    };
+  }
+  // טיסות אחרות דרככם — מבטל ומסתיר את "טיסה עצמאית"
+  container.querySelector("#altFlights").onchange = (e)=>{
+    state.altFlights = e.target.checked;
+    if(e.target.checked) state.independentFlight = false;
+    renderFlightStep(container);
   };
+  container.querySelectorAll("[data-alt-flight]").forEach(cb=>{
+    cb.onchange = ()=>{
+      const set = new Set(state.altFlightOptions);
+      if(cb.checked) set.add(cb.value); else set.delete(cb.value);
+      state.altFlightOptions = ALT_FLIGHT_OPTIONS.filter(o=>set.has(o));
+      if(cb.value === "אחר") renderFlightStep(container);
+      else cb.closest(".chip").classList.toggle("selected", cb.checked);
+    };
+  });
   container.querySelector("#insuranceOptIn").onchange = (e)=>{ state.insuranceOptIn = e.target.checked; };
   navButtons(container);
 }

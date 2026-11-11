@@ -211,6 +211,9 @@ function flattenPayload(p) {
   f.submitted_at   = p.submitted_at || "";
   f.travelers_count = String(p.travelersCount || "1");
   f.independent_flight = p.independentFlight ? "כן" : "לא";
+  f.alt_flights         = p.altFlights ? "כן" : "לא";
+  f.alt_flights_options = p.altFlights && Array.isArray(p.altFlightOptions) ? p.altFlightOptions.join(", ") : "";
+  f.alt_flights_other   = p.altFlights && (p.altFlightOptions || []).includes("אחר") ? (p.altFlightOther || "") : "";
   f.insurance_opt_in   = p.insuranceOptIn    ? "כן" : "לא";
   f.insurance_follow_up           = p.insuranceOfferFollowUp           ? "כן" : "לא";
   f.insurance_parallel_confirmed  = p.insuranceOfferParallelConfirmed  ? "כן" : "לא";
@@ -225,6 +228,8 @@ function flattenPayload(p) {
     f[`traveler${n}_passportExpiry`]  = t.passportExpiry  || "";
     f[`traveler${n}_dob`]             = t.dob             || "";
     f[`traveler${n}_profession`]      = t.profession      || "";
+    f[`traveler${n}_tripFood`]        = Array.isArray(t.tripFood) ? t.tripFood.join(", ") : (t.tripFood || "");
+    f[`traveler${n}_foodRestrictions`] = t.foodRestrictions || "";
     f[`traveler${n}_meal`]            = t.meal            || "";
     f[`traveler${n}_frequentFlyer`]   = t.frequentFlyer   || "";
     f[`traveler${n}_seat`]            = t.seat            || "";
