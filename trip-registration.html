@@ -313,31 +313,71 @@
     color:var(--maroon-dark);
   }
 
-  /* ---- Multi-select chips (אוכל בטיול) ---- */
-  .chip-grid{display:flex;flex-wrap:wrap;gap:8px;}
+  /* ---- Multi-select chips (אוכל בטיול, טיסות אחרות) ---- */
+  .chip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  @media (max-width:560px){.chip-grid{grid-template-columns:repeat(2,1fr);}}
+  .chip-grid.stack{grid-template-columns:1fr;}
   .field label.chip{
-    display:inline-flex;
+    position:relative;
+    display:flex;
     align-items:center;
-    gap:8px;
+    gap:10px;
     margin:0;
-    font-weight:400;
+    font-weight:500;
     color:var(--ink);
     border:1.5px solid var(--border);
-    border-radius:999px;
-    padding:8px 14px;
+    border-radius:12px;
+    padding:10px 12px;
     font-size:14px;
+    line-height:1.3;
     cursor:pointer;
     background:#fff;
-    transition:.15s;
+    transition:border-color .15s, background .15s, box-shadow .15s;
     user-select:none;
   }
-  .field label.chip input{margin:0;width:16px;height:16px;accent-color:var(--maroon);}
+  .field label.chip:hover{border-color:#bfa9a0;}
+  /* תיבת הסימון המקורית מוסתרת אך נשארת נגישה למקלדת */
+  .field label.chip input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none;}
+  .field label.chip .tick{
+    flex-shrink:0;
+    width:20px;height:20px;
+    border-radius:6px;
+    border:1.5px solid #c9bdb5;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    transition:.15s;
+  }
+  .field label.chip .tick svg{width:12px;height:12px;opacity:0;transform:scale(.6);transition:.15s;}
   .field label.chip.selected{
     border-color:var(--maroon);
     background:var(--sage-light);
     color:var(--maroon-dark);
     font-weight:600;
+    box-shadow:0 1px 0 rgba(115,18,43,.06), 0 4px 10px -6px rgba(115,18,43,.35);
   }
+  .field label.chip.selected .tick{background:var(--maroon);border-color:var(--maroon);}
+  .field label.chip.selected .tick svg{opacity:1;transform:scale(1);}
+  .field label.chip:has(input:focus-visible){outline:2px solid var(--maroon);outline-offset:2px;}
+
+  /* ---- בלוק נושא בתוך שלב (למשל: אוכל בטיול) ---- */
+  .topic-block{
+    background:linear-gradient(180deg, #fff 0%, var(--cream) 100%);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:16px 16px 4px;
+    margin:6px 0 18px;
+  }
+  .topic-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .topic-icon{
+    width:34px;height:34px;flex-shrink:0;
+    border-radius:50%;
+    background:var(--sage);
+    color:var(--maroon);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .topic-icon svg{width:18px;height:18px;}
+  .topic-title{font-size:15px;font-weight:700;color:var(--maroon-dark);line-height:1.2;}
+  .topic-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
 
   .switch-row{
     display:flex;
@@ -1996,22 +2036,36 @@ function tripFoodFieldsHtml(idx){
   const t = state.travelers[idx];
   const chosen = Array.isArray(t.tripFood) ? t.tripFood : [];
   return `
-    <div class="field">
-      <label>אוכל בטיול — סמנו את כל מה שמתאים לכם</label>
-      <div class="chip-grid">
-        ${MEAL_OPTIONS.map(opt=>{
-          const on = chosen.includes(opt);
-          return `<label class="chip ${on?"selected":""}">
-            <input type="checkbox" data-trip-food="${idx}" value="${opt}" ${on?"checked":""}>${opt}
-          </label>`;
-        }).join("")}
+    <div class="topic-block">
+      <div class="topic-head">
+        <div class="topic-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8a2 2 0 0 0 2 2v8"/><path d="M5 3v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3"/><path d="M18 21V3c-2 0-4 2-4 6v5h4"/></svg>
+        </div>
+        <div>
+          <div class="topic-title">העדפות אוכל בטיול</div>
+          <div class="topic-sub">כדי שנוכל להתאים את הארוחות במהלך הטיול</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>מה אתם אוכלים? סמנו את כל מה שמתאים</label>
+        <div class="chip-grid">
+          ${MEAL_OPTIONS.map(opt=>chipHtml(opt, chosen.includes(opt), `data-trip-food="${idx}"`)).join("")}
+        </div>
+      </div>
+      <div class="field">
+        <label>מגבלות מזון <span style="font-weight:400;color:var(--muted);">(לא חובה)</span></label>
+        <textarea rows="2" data-bind="travelers.${idx}.foodRestrictions" placeholder="למשל: אלרגיה לאגוזים, רגישות למזון מסוים">${t.foodRestrictions || ""}</textarea>
       </div>
     </div>
-    <div class="field">
-      <label>מגבלות מזון</label>
-      <textarea rows="2" data-bind="travelers.${idx}.foodRestrictions" placeholder="למשל: אלרגיה לאגוזים, רגישות למזון מסוים">${t.foodRestrictions || ""}</textarea>
-    </div>
   `;
+}
+
+function chipHtml(value, on, dataAttr){
+  return `<label class="chip ${on?"selected":""}">
+    <input type="checkbox" ${dataAttr} value="${value}" ${on?"checked":""}>
+    <span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span>
+    <span>${value}</span>
+  </label>`;
 }
 
 function bindTripFood(container){
@@ -2194,11 +2248,8 @@ function renderFlightStep(container){
     ${state.altFlights ? `
     <div class="field">
       <label>מה תרצו? (אפשר לסמן כמה)</label>
-      <div class="chip-grid">
-        ${ALT_FLIGHT_OPTIONS.map(opt=>{
-          const on = state.altFlightOptions.includes(opt);
-          return `<label class="chip ${on?"selected":""}"><input type="checkbox" data-alt-flight value="${opt}" ${on?"checked":""}>${opt}</label>`;
-        }).join("")}
+      <div class="chip-grid stack">
+        ${ALT_FLIGHT_OPTIONS.map(opt=>chipHtml(opt, state.altFlightOptions.includes(opt), "data-alt-flight")).join("")}
       </div>
     </div>
     ${state.altFlightOptions.includes("אחר") ? `
