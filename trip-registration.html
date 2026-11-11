@@ -2240,10 +2240,11 @@ function renderFlightStep(container){
       <label class="switch"><input type="checkbox" id="independentFlight" ${state.independentFlight?"checked":""}><span class="slider"></span></label>
     </div>`}
 
+    ${state.independentFlight ? "" : `
     <div class="switch-row">
       <span class="lbl">מעוניין/ת להזמין דרככם טיסות אחרות לטיול הזה</span>
       <label class="switch"><input type="checkbox" id="altFlights" ${state.altFlights?"checked":""}><span class="slider"></span></label>
-    </div>
+    </div>`}
 
     ${state.altFlights ? `
     <div class="field">
@@ -2277,18 +2278,22 @@ function renderFlightStep(container){
   bindInputs(container);
   const indep = container.querySelector("#independentFlight");
   if(indep){
+    // טיסה עצמאית — מבטלת ומסתירה את "טיסות אחרות דרככם"
     indep.onchange = (e)=>{
       state.independentFlight = e.target.checked;
-      document.getElementById("flightDetailsWrap").style.display = e.target.checked ? "none":"";
-      document.getElementById("independentFlightNotice").style.display = e.target.checked ? "block":"none";
+      if(e.target.checked) state.altFlights = false;
+      renderFlightStep(container);
     };
   }
   // טיסות אחרות דרככם — מבטל ומסתיר את "טיסה עצמאית"
-  container.querySelector("#altFlights").onchange = (e)=>{
-    state.altFlights = e.target.checked;
-    if(e.target.checked) state.independentFlight = false;
-    renderFlightStep(container);
-  };
+  const alt = container.querySelector("#altFlights");
+  if(alt){
+    alt.onchange = (e)=>{
+      state.altFlights = e.target.checked;
+      if(e.target.checked) state.independentFlight = false;
+      renderFlightStep(container);
+    };
+  }
   container.querySelectorAll("[data-alt-flight]").forEach(cb=>{
     cb.onchange = ()=>{
       const set = new Set(state.altFlightOptions);
