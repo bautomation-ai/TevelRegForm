@@ -293,6 +293,38 @@
   .field.invalid input, .field.invalid select{border-color:var(--error);}
   .field.invalid .err{display:block;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* ---- שם מלא + מין ---- */
+  .row-name{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;}
+  .seg{
+    display:flex;
+    padding:3px;
+    gap:3px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    height:43px;
+  }
+  .seg button{
+    flex:1;
+    min-width:58px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--muted);
+    cursor:pointer;
+    transition:background .15s, color .15s;
+  }
+  .seg button:hover{background:var(--cream);color:var(--ink);}
+  .seg button.on{background:var(--maroon);color:#fff;font-weight:600;}
+  .seg button:focus-visible{outline:2px solid var(--maroon);outline-offset:2px;}
+  @media (max-width:480px){
+    .row-name{gap:8px;}
+    .seg button{min-width:42px;font-size:14px;}
+  }
   @media (max-width:480px){.row2{grid-template-columns:1fr;}}
 
   .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
@@ -1033,10 +1065,10 @@ function buildEmptyState(){
   return {
     travelersCount: "1",
     travelers: [
-      { fullNameHe:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
+      { fullNameHe:"", gender:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
         tripFood:[], foodRestrictions:"",
         meal:"", frequentFlyer:"", seat:"", flightRequests:"" },
-      { fullNameHe:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
+      { fullNameHe:"", gender:"", firstNameEn:"", lastNameEn:"", passportNum:"", passportExpiry:"", dob:"", profession:"",
         tripFood:[], foodRestrictions:"",
         meal:"", frequentFlyer:"", seat:"", flightRequests:"" }
     ],
@@ -1062,13 +1094,13 @@ function buildDemoState(){
   const s = buildEmptyState();
   s.travelersCount = "1";
   s.travelers[0] = {
-    fullNameHe:"ישראל ישראלי", firstNameEn:"ISRAEL", lastNameEn:"ISRAELI", passportNum:"12345678",
+    fullNameHe:"ישראל ישראלי", gender:"גבר", firstNameEn:"ISRAEL", lastNameEn:"ISRAELI", passportNum:"12345678",
     passportExpiry:"2028-12-31", dob:"1985-04-15", profession:"מהנדס",
     tripFood:["רגילה"], foodRestrictions:"",
     meal:"רגילה", frequentFlyer:"LY12345", seat:"חלון", flightRequests:""
   };
   s.travelers[1] = {
-    fullNameHe:"דנה ישראלי", firstNameEn:"DANA", lastNameEn:"ISRAELI", passportNum:"87654321",
+    fullNameHe:"דנה ישראלי", gender:"אשה", firstNameEn:"DANA", lastNameEn:"ISRAELI", passportNum:"87654321",
     passportExpiry:"2029-05-31", dob:"1988-09-22", profession:"מנהלת פרויקטים",
     tripFood:["צמחונית", "ללא לקטוז"], foodRestrictions:"אלרגיה לאגוזים",
     meal:"צמחונית", frequentFlyer:"LY67890", seat:"מעבר", flightRequests:""
@@ -1991,10 +2023,18 @@ function travelerFieldsHtml(idx){
   const t = state.travelers[idx];
   const passportWarning = passportExpiryWarning(t.passportExpiry);
   return `
-    <div class="field">
-      <label>שם מלא (בעברית) <span class="req">*</span></label>
-      <input type="text" data-bind="travelers.${idx}.fullNameHe" value="${t.fullNameHe}" placeholder="רק אותיות בעברית" data-validate-type="hebrew-name" id="fullNameHe_${idx}">
-      <div id="err_fullNameHe_${idx}" class="error-msg"></div>
+    <div class="row-name">
+      <div class="field">
+        <label>שם מלא (בעברית) <span class="req">*</span></label>
+        <input type="text" data-bind="travelers.${idx}.fullNameHe" value="${t.fullNameHe}" placeholder="רק אותיות בעברית" data-validate-type="hebrew-name" id="fullNameHe_${idx}">
+        <div id="err_fullNameHe_${idx}" class="error-msg"></div>
+      </div>
+      <div class="field">
+        <label id="genderLbl_${idx}">מין <span class="req">*</span></label>
+        <div class="seg" role="radiogroup" aria-labelledby="genderLbl_${idx}">
+          ${["גבר","אשה"].map(g=>`<button type="button" role="radio" aria-checked="${t.gender===g}" class="${t.gender===g?"on":""}" data-gender="${idx}" data-value="${g}">${g}</button>`).join("")}
+        </div>
+      </div>
     </div>
     <div class="row2">
       <div class="field">
@@ -2104,6 +2144,17 @@ function renderPersonalStep(container){
   });
   bindInputs(container);
   bindTripFood(container);
+  container.querySelectorAll("[data-gender]").forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = btn.dataset.gender;
+      state.travelers[parseInt(idx,10)].gender = btn.dataset.value;
+      container.querySelectorAll(`[data-gender="${idx}"]`).forEach(b=>{
+        const on = b === btn;
+        b.classList.toggle("on", on);
+        b.setAttribute("aria-checked", String(on));
+      });
+    };
+  });
 
   // Live-update section titles as names are typed
   [0, 1].forEach(idx => {
@@ -2165,6 +2216,12 @@ function validatePersonalStep(){
         alert(`נא למלא את כל השדות החיוניים עבור ${label}`);
         return false;
       }
+    }
+
+    // 1b. Gender
+    if(!trav.gender){
+      alert(`נא לסמן גבר/אשה עבור ${label}`);
+      return false;
     }
 
     // 2. Validate Hebrew name (only Hebrew letters and spaces)

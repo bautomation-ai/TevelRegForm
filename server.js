@@ -222,6 +222,7 @@ function flattenPayload(p) {
   (p.travelers || []).forEach((t, i) => {
     const n = i + 1;
     f[`traveler${n}_fullNameHe`]      = t.fullNameHe      || "";
+    f[`traveler${n}_gender`]          = t.gender          || "";
     f[`traveler${n}_firstNameEn`]     = t.firstNameEn     || "";
     f[`traveler${n}_lastNameEn`]      = t.lastNameEn      || "";
     f[`traveler${n}_passportNum`]     = t.passportNum     || "";
