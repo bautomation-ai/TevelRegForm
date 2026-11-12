@@ -214,6 +214,20 @@ function flattenPayload(p) {
   f.alt_flights         = p.altFlights ? "כן" : "לא";
   f.alt_flights_options = p.altFlights && Array.isArray(p.altFlightOptions) ? p.altFlightOptions.join(", ") : "";
   f.alt_flights_other   = p.altFlights && (p.altFlightOptions || []).includes("אחר") ? (p.altFlightOther || "") : "";
+
+  // FlightStatus — מצב הטיסה לפי שני המתגים (הטופס לא מאפשר את שניהם יחד)
+  if (p.altFlights) {
+    f.FlightStatus = "Client With Divide - Within Group";
+    // הבחירות שסומנו, ו"אחר" מוחלף בטקסט שנכתב (אם נכתב)
+    const other = String(p.altFlightOther || "").trim();
+    f.DivideFlightDetails = (Array.isArray(p.altFlightOptions) ? p.altFlightOptions : [])
+      .map((o) => (o === "אחר" && other ? `אחר: ${other}` : o))
+      .join(", ");
+  } else if (p.independentFlight) {
+    f.FlightStatus = "קיבלו זיכוי טיסות - הזמנה באופן עצמאי";
+  } else {
+    f.FlightStatus = "Group Flight";
+  }
   f.insurance_opt_in   = p.insuranceOptIn    ? "כן" : "לא";
   f.insurance_follow_up           = p.insuranceOfferFollowUp           ? "כן" : "לא";
   f.insurance_parallel_confirmed  = p.insuranceOfferParallelConfirmed  ? "כן" : "לא";
