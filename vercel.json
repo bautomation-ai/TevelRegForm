@@ -6,6 +6,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "logo-header.png",
+      "use": "@vercel/static"
+    },
+    {
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
@@ -17,6 +21,10 @@
     {
       "src": "/newlogo.png",
       "dest": "/newlogo.png"
+    },
+    {
+      "src": "/logo-header.png",
+      "dest": "/logo-header.png"
     },
     {
       "src": "/(.*)",

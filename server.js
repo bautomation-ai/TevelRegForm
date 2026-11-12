@@ -210,11 +210,6 @@ function flattenPayload(p) {
   f.trip_type      = p.trip_type    || "";
   f.submitted_at   = p.submitted_at || "";
   f.travelers_count = String(p.travelersCount || "1");
-  f.independent_flight = p.independentFlight ? "כן" : "לא";
-  f.alt_flights         = p.altFlights ? "כן" : "לא";
-  f.alt_flights_options = p.altFlights && Array.isArray(p.altFlightOptions) ? p.altFlightOptions.join(", ") : "";
-  f.alt_flights_other   = p.altFlights && (p.altFlightOptions || []).includes("אחר") ? (p.altFlightOther || "") : "";
-
   // FlightStatus — מצב הטיסה לפי שני המתגים (הטופס לא מאפשר את שניהם יחד)
   if (p.altFlights) {
     f.FlightStatus = "Client With Divide - Within Group";

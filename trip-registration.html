@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>הרשמה לטיול | תבל</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Frank+Ruhl+Libre:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
     --maroon:#73122B;
@@ -910,66 +910,118 @@
   .wl-submit:disabled{opacity:.6;transform:none;cursor:default;}
   .wl-pass-footer{height:6px;background:linear-gradient(90deg,#73122B 0%,#B99552 50%,#48826E 100%);}
 
-  /* === MAIN FORM BOARDING PASS HEADER === */
+  /* === MAIN FORM HEADER — כרטיס עלייה למטוס === */
   .mf-bp-header{
-    background:#F8F4EE;border-radius:var(--radius);overflow:hidden;
-    margin-bottom:10px;border:1px solid #e4d8ce;
-    box-shadow:0 2px 10px rgba(70,42,30,.07);
+    background:#FBF8F3;border-radius:18px;overflow:hidden;
+    margin-bottom:14px;border:1px solid #e4d8ce;
+    box-shadow:0 1px 0 rgba(255,255,255,.8) inset, 0 18px 40px -22px rgba(84,9,31,.45), 0 2px 8px rgba(70,42,30,.06);
   }
-  .mf-bp-topbar{
-    height:4px;
-    background:linear-gradient(90deg,#7A1515 0%,#B99552 50%,#2d5e3c 100%);
+
+  /* פס המותג: לוגו גדול על רקע בהיר */
+  .mf-brand{
+    display:flex;align-items:center;justify-content:center;
+    padding:22px 18px 18px;
+    background:
+      radial-gradient(500px 120px at 50% 0%, rgba(185,149,82,.14), transparent 70%),
+      #FBF8F3;
   }
-  .mf-bp-inner{padding:0 14px 6px;}
-  .mf-bp-top{
-    display:flex;align-items:center;justify-content:flex-start;
-    margin-bottom:0;
+  .mf-bp-logo{height:84px;width:auto;max-width:88%;display:block;}
+
+  /* רצועת הטיול: בורדו עמוק עם זוהר זהב */
+  .mf-hero{
+    position:relative;
+    text-align:center;
+    padding:26px 22px 24px;
+    color:#FBF6EE;
+    background:
+      radial-gradient(520px 200px at 85% -20%, rgba(185,149,82,.30), transparent 65%),
+      radial-gradient(420px 180px at 10% 120%, rgba(72,130,110,.28), transparent 65%),
+      linear-gradient(160deg, #7E1631 0%, #5A0A22 55%, #45071A 100%);
   }
-  .mf-bp-logo{height:110px;width:auto;max-width:300px;display:block;mix-blend-mode:darken;}
-  .mf-bp-step-badge{
-    background:rgba(122,21,21,.08);border:1px solid rgba(122,21,21,.25);
-    color:#7A1515;font-size:11px;font-weight:700;letter-spacing:1px;
-    padding:3px 10px;border-radius:999px;flex-shrink:0;white-space:nowrap;
+  /* קו זהב דק בראש הרצועה ובתחתיתה */
+  .mf-hero::before,.mf-hero::after{
+    content:"";position:absolute;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(214,181,118,.85),transparent);
   }
-  .mf-bp-trip-block{text-align:center;padding:0 0 4px;}
+  .mf-hero::before{top:0;}
+  .mf-hero::after{bottom:0;}
   .mf-bp-trip-label{
-    font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
-    color:#8a6a50;font-weight:600;margin:0 0 3px;
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:13px;letter-spacing:3px;font-weight:600;
+    color:#D9BC82;margin:0 0 10px;
   }
+  .mf-bp-trip-label::before,.mf-bp-trip-label::after{
+    content:"";width:26px;height:1px;background:linear-gradient(90deg,transparent,#D9BC82);
+  }
+  .mf-bp-trip-label::after{background:linear-gradient(90deg,#D9BC82,transparent);}
   .mf-bp-trip-name{
-    font-size:30px;font-weight:800;margin:0;line-height:1.15;
-    background:linear-gradient(135deg,#7A1515 0%,#B99552 60%,#2d5e3c 100%);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    font-family:'Frank Ruhl Libre','Assistant',serif;
+    font-size:48px;font-weight:700;margin:0;line-height:1.08;
+    color:#FFF9F0;letter-spacing:.4px;
+    text-shadow:0 2px 18px rgba(0,0,0,.25);
   }
-  .mf-bp-journey-header{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:2px;
+
+  /* תאריכים בסגנון כרטיס טיסה */
+  .mf-dates{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    margin:20px auto 0;max-width:430px;
   }
-  .mf-bp-date-side{font-size:11px;font-weight:600;color:#6a5240;line-height:1;}
+  .mf-date{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:96px;}
+  .mf-date .k{font-size:11px;letter-spacing:2px;color:#D9BC82;font-weight:600;}
+  .mf-date .v{font-size:17px;font-weight:700;color:#FFF9F0;letter-spacing:.5px;font-variant-numeric:tabular-nums;}
+  .mf-route{
+    flex:1;position:relative;height:20px;display:flex;align-items:center;justify-content:center;
+  }
+  .mf-route::before{
+    content:"";position:absolute;left:0;right:0;top:50%;
+    border-top:1.5px dashed rgba(217,188,130,.6);
+  }
+  .mf-route svg{position:relative;width:20px;height:20px;color:#D9BC82;background:#5E0B24;padding:0 4px;box-sizing:content-box;}
+
+  /* התקדמות בטופס */
+  .mf-progress{padding:14px 20px 14px;}
+  .mf-progress-meta{
+    display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    margin-bottom:9px;font-size:12.5px;color:var(--muted);
+  }
+  .mf-progress-meta b{color:var(--maroon-dark);font-weight:700;font-size:13.5px;}
   .mf-bp-track-outer{position:relative;margin-bottom:0;}
   .mf-bp-track-line{
-    position:absolute;top:50%;left:0;right:0;height:2px;
-    background:rgba(122,21,21,.12);transform:translateY(-50%);z-index:1;
+    position:absolute;top:50%;left:0;right:0;height:3px;border-radius:3px;
+    background:rgba(122,21,21,.10);transform:translateY(-50%);z-index:1;
   }
   .mf-bp-track-fill{
-    position:absolute;top:0;right:0;height:100%;
-    background:#7A1515;border-radius:2px;transition:width .4s ease;
+    position:absolute;top:0;right:0;height:100%;border-radius:3px;
+    background:linear-gradient(270deg,#7A1515,#B99552);transition:width .4s ease;
   }
   .mf-bp-dots-row{
     display:flex;width:100%;justify-content:space-between;
     align-items:center;position:relative;z-index:2;padding:3px 0;
   }
   .mf-bp-dot{
-    width:8px;height:8px;border-radius:50%;flex-shrink:0;
-    background:#e4d8ce;border:2px solid rgba(122,21,21,.2);transition:all .3s;
+    width:10px;height:10px;border-radius:50%;flex-shrink:0;
+    background:#FBF8F3;border:2px solid rgba(122,21,21,.22);transition:all .3s;
   }
   .mf-bp-dot.done{background:#7A1515;border-color:#7A1515;}
   .mf-bp-dot.plane{
-    background:none;border:none;font-size:15px;line-height:1;
-    width:16px;height:16px;display:flex;align-items:center;justify-content:center;
+    background:#7A1515;border:none;color:#fff;font-size:12px;line-height:1;
+    width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 4px rgba(122,21,21,.12);
     transform:scaleX(-1);
   }
-  .mf-bp-step-label{font-size:12px;color:#4a3a2e;margin-top:4px;text-align:right;}
+
+  @media (max-width:480px){
+    .mf-brand{padding:18px 14px 14px;}
+    .mf-bp-logo{height:62px;}
+    .mf-hero{padding:22px 16px 20px;}
+    .mf-bp-trip-label{font-size:12px;letter-spacing:2px;}
+    .mf-bp-trip-name{font-size:34px;}
+    .mf-dates{gap:8px;margin-top:16px;}
+    .mf-date{min-width:84px;}
+    .mf-date .v{font-size:15px;}
+    .mf-progress{padding:12px 14px;}
+  }
 
   /* airplane floating in trip header */
   .header-plane{
@@ -1890,18 +1942,25 @@ function renderApp(){
       ${usingDefaultTripId ? `<div class="trip-warning">⚠️ לא צוין מזהה טיול בקישור (?id=) — מוצג טיול דמו לבדיקה (${CONFIG.DEFAULT_TRIP_ID}).</div>` : ""}
     </div>
     <div class="mf-bp-header">
-      <div class="mf-bp-topbar"></div>
-      <div class="mf-bp-inner">
-        <div class="mf-bp-top">
-          <img src="newlogo.png" class="mf-bp-logo" alt="לוגו תבל">
-        </div>
-        <div class="mf-bp-trip-block">
-          <p class="mf-bp-trip-label">✦ הרשמה ל${trip.fields[F.tripType] || "טיול"} ✦</p>
-          <h1 class="mf-bp-trip-name">${trip.fields[F.name] || ""}</h1>
-        </div>
-        <div class="mf-bp-journey-header">
-          ${trip.fields[F.departDate] ? `<div class="mf-bp-date-side">${formatDateEuropean(trip.fields[F.departDate])}</div>` : "<div></div>"}
-          ${trip.fields[F.returnDate] ? `<div class="mf-bp-date-side" style="text-align:left">${formatDateEuropean(trip.fields[F.returnDate])}</div>` : "<div></div>"}
+      <div class="mf-brand">
+        <img src="logo-header.png" class="mf-bp-logo" alt="קשרי תרבות תבל">
+      </div>
+      <div class="mf-hero">
+        <p class="mf-bp-trip-label">הרשמה ל${trip.fields[F.tripType] || "טיול"}</p>
+        <h1 class="mf-bp-trip-name">${trip.fields[F.name] || ""}</h1>
+        ${(trip.fields[F.departDate] || trip.fields[F.returnDate]) ? `
+        <div class="mf-dates">
+          <div class="mf-date"><span class="k">יציאה</span><span class="v">${formatDateEuropean(trip.fields[F.departDate]) || "—"}</span></div>
+          <div class="mf-route" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(-90 12 12)"/></svg>
+          </div>
+          <div class="mf-date"><span class="k">חזרה</span><span class="v">${formatDateEuropean(trip.fields[F.returnDate]) || "—"}</span></div>
+        </div>` : ""}
+      </div>
+      <div class="mf-progress">
+        <div class="mf-progress-meta">
+          <b>${step.title}</b>
+          <span>שלב ${currentStepIndex + 1} מתוך ${steps.length}</span>
         </div>
         <div class="mf-bp-track-outer">
           <div class="mf-bp-track-line"><div class="mf-bp-track-fill" style="width:${trackFillPct}%"></div></div>
