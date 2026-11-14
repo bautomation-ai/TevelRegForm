@@ -205,6 +205,7 @@ app.get("/api/cruise-options/by-trip/:tripId", async (req, res) => {
 
 function flattenPayload(p) {
   const f = {};
+  f.submission_id  = p.submission_id || "";
   f.trip_id        = p.trip_id      || "";
   f.trip_name      = p.trip_name    || "";
   f.trip_type      = p.trip_type    || "";

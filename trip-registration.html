@@ -3160,10 +3160,24 @@ function bindInputs(container){
 /* ======================================================================
    Submit
    ====================================================================== */
+// מזהה הרשמה ייחודי — נשלח למייק (נשמר בפיירברי) ולקארדקום ב-ReturnData,
+// כדי לקשר את וובהוק התשלום לרשומות. נוצר פעם אחת לכל טעינת דף, כך שניסיון חוזר אחרי שגיאה ישתמש באותו מזהה.
+let submissionId = null;
+function getSubmissionId(){
+  if(!submissionId){
+    const rand = (window.crypto && crypto.getRandomValues)
+      ? Array.from(crypto.getRandomValues(new Uint8Array(4)), b=>b.toString(36).padStart(2,"0")).join("")
+      : Math.random().toString(36).slice(2,10);
+    submissionId = "R" + Date.now().toString(36).toUpperCase() + rand.toUpperCase();
+  }
+  return submissionId;
+}
+
 async function submitForm(){
   if(!steps[currentStepIndex].validate()) return;
 
   const payload = {
+    submission_id: getSubmissionId(),
     trip_id: trip.id,
     trip_name: trip.fields[F.name],
     trip_type: tripTypeName(),
@@ -3184,7 +3198,9 @@ async function submitForm(){
     const paymentUrl = travelerCount === "2" ? CONFIG.PAYMENT_URL_2 : CONFIG.PAYMENT_URL_1;
 
     if(paymentUrl){
-      window.location.href = paymentUrl;
+      const url = new URL(paymentUrl, window.location.href);
+      url.searchParams.set("ReturnData", payload.submission_id);
+      window.location.href = url.toString();
     } else {
       renderDone(result.mode === "dry-run");
     }
